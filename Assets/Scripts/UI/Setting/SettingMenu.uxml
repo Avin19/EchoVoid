@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Setting/SettingMenu.uss?fileID=7433441132597879392&amp;guid=4a36215c39df90f4e94e0403c703423d&amp;type=3#SettingMenu" />
+    <ui:VisualElement class="root">
+        <ui:Label text="SETTINGS" class="title" />
+        <ui:VisualElement class="menu-container">
+            <ui:VisualElement class="setting-item">
+                <ui:Label text="SOUND VOLUME" class="setting-label" />
+                <ui:Slider name="volume-slider" high-value="1.0" low-value="0.0" value="0.8" class="slider" />
+            </ui:VisualElement>
+            <ui:VisualElement class="setting-item">
+                <ui:Label text="GRAPHICS" class="setting-label" />
+                <ui:DropdownField name="graphics-dropdown" choices="Low,Medium,High" value="Medium" class="dropdown" />
+            </ui:VisualElement>
+            <ui:VisualElement class="setting-item">
+                <ui:Label text="VIBRATION" class="setting-label" />
+                <ui:Toggle name="vibration-toggle" value="true" class="toggle" />
+            </ui:VisualElement>
+            <ui:Button name="back-button" text="BACK" class="menu-button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

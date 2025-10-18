@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Win/WinPanel.uss?fileID=7433441132597879392&amp;guid=8d64aeda255e6d34e90ef4babdb2b777&amp;type=3#WinPanel" />
+    <ui:VisualElement name="win-root" class="win-root">
+        <ui:VisualElement class="win-panel">
+            <ui:Label name="win-title" text="LEVEL COMPLETE" class="win-title" />
+            <ui:Label name="win-score" text="SCORE: 0000" class="win-score" />
+            <ui:VisualElement class="win-buttons">
+                <ui:Button name="next-level-button" text="NEXT LEVEL" class="win-button" />
+                <ui:Button name="reward-button" text="WATCH AD FOR BONUS" class="win-button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/MainMenu/MainMenu.uss?fileID=7433441132597879392&amp;guid=c54df3efd9bf7554ebf0d8e7f939dda2&amp;type=3#MainMenu" />
+    <ui:VisualElement class="root">
+        <ui:VisualElement name="ripple1" class="ripple-bg" />
+        <ui:VisualElement name="ripple2" class="ripple-bg delay1" />
+        <ui:VisualElement name="ripple3" class="ripple-bg delay2" />
+        <ui:Label text="ECHO VOID" class="title" />
+        <ui:VisualElement class="menu-container">
+            <ui:Button name="start-button" text="START" class="menu-button" />
+            <ui:Button name="settings-button" text="SETTINGS" class="menu-button" />
+            <ui:Button name="exit-button" text="EXIT" class="menu-button" />
+        </ui:VisualElement>
+        <ui:Label text="v1.0" class="footer" />
+    </ui:VisualElement>
+</ui:UXML>

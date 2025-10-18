@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="project://database/Assets/UI/Tutorial/TutorialUI.uss" />
+
+    <ui:VisualElement class="tutorial-root">
+
+        <!-- Text Box -->
+        <ui:VisualElement class="tutorial-panel">
+            <ui:Label name="tutorial-text" class="tutorial-text" text="Move using WASD or Arrow Keys" />
+        </ui:VisualElement>
+
+        <!-- Icons (for visual cue) -->
+        <ui:VisualElement class="icon-container">
+            <ui:VisualElement name="move-icon" class="move-icon" />
+            <ui:VisualElement name="pulse-icon" class="pulse-icon" style="display: none;" />
+        </ui:VisualElement>
+
+        <!-- Continue Hint -->
+        <ui:Label name="hint-label" class="hint-label" text="Perform the action to continue..." />
+    </ui:VisualElement>
+</ui:UXML>
+

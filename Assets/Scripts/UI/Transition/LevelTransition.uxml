@@ -1,0 +1,4 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Transition/LevelTransition.uss?fileID=7433441132597879392&amp;guid=227697a9e6a5cbf4c86c87a7201c1639&amp;type=3#LevelTransition" />
+    <ui:VisualElement name="fade-overlay" class="fade-overlay" />
+</ui:UXML>

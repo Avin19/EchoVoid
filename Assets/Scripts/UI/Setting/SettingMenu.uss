@@ -1,0 +1,59 @@
+.root {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #000000;
+    height: 100%;
+    width: 100%;
+}
+
+.title {
+    font-size: 48px;
+    color: #00ffff;
+    unity-font-style: bold;
+    text-shadow: 0 0 10px #00ffff;
+    margin-bottom: 40px;
+}
+
+.menu-container {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+}
+
+.setting-item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 300px;
+}
+
+.setting-label {
+    color: #00ffff;
+    font-size: 20px;
+    text-shadow: 0 0 5px #00ffff;
+}
+
+.slider, .dropdown, .toggle {
+    width: 140px;
+    color: #00ffff;
+}
+
+.menu-button {
+    width: 200px;
+    height: 48px;
+    font-size: 20px;
+    color: #00ffff;
+    border-width: 2px;
+    border-color: #00ffff;
+    border-radius: 10px;
+    background-color: rgba(0, 255, 255, 0.05);
+    transition-property: background-color, color;
+    transition-duration: 0.2s;
+}
+
+.menu-button:hover {
+    background-color: rgba(0, 255, 255, 0.2);
+    color: white;
+}

@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Loss/LossPanel.uss?fileID=7433441132597879392&amp;guid=d9ce217ee0ef3a94b9d73e2e5fb3534e&amp;type=3#LossPanel" />
+    <ui:VisualElement name="loss-root" class="loss-root">
+        <ui:VisualElement class="loss-panel">
+            <ui:Label text="OUT OF ENERGY" class="loss-title" />
+            <ui:Label text="Would you like to continue?" class="loss-subtext" />
+            <ui:VisualElement class="loss-buttons">
+                <ui:Button name="watch-ad-button" text="WATCH AD TO CONTINUE" class="loss-button" />
+                <ui:Button name="restart-button" text="RESTART LEVEL" class="loss-button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

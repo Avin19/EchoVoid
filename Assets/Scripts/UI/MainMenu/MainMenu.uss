@@ -1,0 +1,120 @@
+/* === ROOT CONTAINER === */
+.root {
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    background-color: #000000;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* === RIPPLE BACKGROUND === */
+.ripple-bg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0px;
+    height: 0px;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 255, 255, 0.5);
+    border-width: 3px; /* thicker line for visibility */
+    border-color: rgba(0, 255, 255, 0.8);
+    transform: translate(-50%, -50%);
+    animation-name: ripple;
+    animation-duration: 4s;
+    animation-timing-function: ease-out;
+    animation-iteration-count: infinite;
+    opacity: 0.8;
+}
+
+/* Ripple animation effect */
+@keyframes ripple {
+    0% {
+        width: 0px;
+        height: 0px;
+        opacity: 0.5;
+        border-color: rgba(0, 255, 255, 0.8);
+    }
+    50% {
+        opacity: 0.3;
+        border-color: rgba(0, 255, 255, 0.6);
+    }
+    100% {
+        width: 1800px;
+        height: 1800px;
+        opacity: 0;
+        border-color: rgba(0, 255, 255, 0);
+    }
+}
+
+/* Staggered animation delays for multiple ripples */
+.delay1 { animation-delay: 1.5s; }
+.delay2 { animation-delay: 3s; }
+
+/* === TITLE TEXT === */
+.title {
+    font-size: 64px;
+    color: #00ffff;
+    unity-font-style: bold;
+    text-shadow: 0 0 15px #00ffff;
+    letter-spacing: 3px;
+    z-index: 2;
+    margin-bottom: 40px;
+    animation-name: pulseGlow;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+}
+
+/* Pulsing title glow */
+@keyframes pulseGlow {
+    0% { text-shadow: 0 0 10px #00ffff; opacity: 1; }
+    50% { text-shadow: 0 0 25px #00ffff; opacity: 0.9; }
+    100% { text-shadow: 0 0 10px #00ffff; opacity: 1; }
+}
+
+/* === MENU BUTTONS === */
+.menu-container {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    z-index: 2;
+}
+
+.menu-button {
+    width: 220px;
+    height: 50px;
+    font-size: 22px;
+    color: #00ffff;
+    border-width: 2px;
+    border-color: #00ffff;
+    border-radius: 10px;
+    background-color: rgba(0, 255, 255, 0.05);
+    text-shadow: 0 0 5px #00ffff;
+    transition-property: background-color, color, text-shadow;
+    transition-duration: 0.3s;
+}
+
+.menu-button:hover {
+    background-color: rgba(0, 255, 255, 0.2);
+    color: white;
+    text-shadow: 0 0 15px #00ffff;
+    cursor: pointer;
+}
+
+.menu-button:active {
+    background-color: rgba(0, 255, 255, 0.4);
+    color: #ffffff;
+    transition-duration: 0.1s;
+}
+
+/* === FOOTER TEXT === */
+.footer {
+    position: absolute;
+    bottom: 10px;
+    right: 15px;
+    color: rgba(0, 255, 255, 0.3);
+    font-size: 12px;
+    z-index: 2;
+}
