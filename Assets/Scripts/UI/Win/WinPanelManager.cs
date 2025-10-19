@@ -48,6 +48,6 @@ public class WinPanelManager : MonoBehaviour
     private void OnRewardClicked()
     {
         HideWinPanel();
-        //AdsManager.Instance?.ShowRewarded();
+        AdManager.Instance?.ShowRewardedAd();
     }
 }

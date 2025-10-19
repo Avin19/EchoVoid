@@ -37,7 +37,7 @@ public class LossPanelManager : MonoBehaviour
 
     private void OnWatchAdClicked()
     {
-        Debug.Log("🎬 Watch Ad to Continue clicked");
+        AdManager.Instance?.ShowRewardedAd();
         HideLossPanel();
     }
 
