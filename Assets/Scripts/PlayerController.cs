@@ -17,32 +17,40 @@ public class PlayerController : MonoBehaviour
     public float pulseCooldown = 0.5f;
     private float nextPulseTime;
 
+    [Header("References")]
+    private Joystick joystick;
+
+    public void AssignJoystick(Joystick joy)
+    {
+        joystick = joy;
+    }
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         currentEnergy = maxEnergy;
         UIManager.Instance?.UpdateEnergy(currentEnergy, maxEnergy);
     }
-    private void OnEnable()
-    {
-        // Subscribe to tap events (mobile)
-        // MobileInputManager.OnTap += HandleTap;
-    }
 
-    private void OnDisable()
-    {
-        // Unsubscribe on disable to prevent leaks
-        // MobileInputManager.OnTap -= HandleTap;
-    }
     void Update()
     {
-        // 🚫 Stop all input when not in Playing state
-        if (!GameManager.Instance || !GameManager.Instance.IsPlaying())
+        if (!GameManager.Instance.IsPlaying())
             return;
 
+#if UNITY_ANDROID || UNITY_IOS
+        // ✅ Use joystick on mobile
+        input = joystick != null ? joystick.Direction : Vector2.zero;
+#else
+        // ✅ Use keyboard on PC
         input.x = Input.GetAxisRaw("Horizontal");
         input.y = Input.GetAxisRaw("Vertical");
+#endif
 
+        // Debug joystick values
+        if (joystick != null)
+            Debug.Log($"Joystick Direction: {joystick.Direction}");
+
+        // ✅ Emit pulse
         if (Input.GetKeyDown(KeyCode.Space))
         {
             TryEmitPulse();
@@ -51,13 +59,13 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!GameManager.Instance || !GameManager.Instance.IsPlaying())
+        if (!GameManager.Instance.IsPlaying())
             return;
 
         rb.MovePosition(rb.position + input * moveSpeed * Time.fixedDeltaTime);
     }
 
-    void TryEmitPulse()
+    public void TryEmitPulse()
     {
         if (Time.time < nextPulseTime) return;
 
@@ -65,13 +73,12 @@ public class PlayerController : MonoBehaviour
         {
             // ✅ Instantiate a pulse at player position
             if (pulsePrefab != null)
-                pulsePrefab?.EmitPulse();
+                pulsePrefab.EmitPulse();
 
             currentEnergy--;
             UIManager.Instance?.UpdateEnergy(currentEnergy, maxEnergy);
             nextPulseTime = Time.time + pulseCooldown;
 
-            // 💀 Notify GameManager when depleted
             if (currentEnergy <= 0)
                 GameManager.Instance?.OnPlayerEnergyDepleted();
         }
@@ -81,21 +88,19 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // ⚡ Called when player continues via ad or collects a powerup
+    // ⚡ Restore energy fully or partially
     public void RestoreFullEnergy()
     {
         currentEnergy = maxEnergy;
         UIManager.Instance?.UpdateEnergy(currentEnergy, maxEnergy);
     }
 
-    // ⚡ Called when player gets energy pickup
     public void RestoreEnergy(int amount)
     {
         currentEnergy = Mathf.Min(maxEnergy, currentEnergy + amount);
         UIManager.Instance?.UpdateEnergy(currentEnergy, maxEnergy);
     }
 
-    // 💡 Optional: expose for debugging or other systems
     public int GetEnergy() => currentEnergy;
     public bool HasEnergy => currentEnergy > 0;
 }

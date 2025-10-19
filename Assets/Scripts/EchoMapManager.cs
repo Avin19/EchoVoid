@@ -21,7 +21,8 @@ public class EchoMapManager : MonoBehaviour
     private EchoMap currentMap;
     private GameObject currentPlayer;
     private GameObject currentGoal;
-
+    [Header("UI References")]
+    public Joystick joystick;
     void Start()
     {
         // GenerateMapAndSpawn();
@@ -91,7 +92,13 @@ public class EchoMapManager : MonoBehaviour
                         var cameraFollow = Camera.main.GetComponent<CameraFollow>();
                         if (cameraFollow != null)
                             cameraFollow.SetTarget(currentPlayer.transform);
+                        // ✅ Assign joystick reference
 
+                        var playerController1 = currentPlayer.GetComponent<PlayerController>();
+                        if (playerController1 != null)
+                        {
+                            playerController1.AssignJoystick(joystick);
+                        }
                         Debug.Log($"✅ Player spawned at tile {tile}");
                         return;
                     }
@@ -105,7 +112,11 @@ public class EchoMapManager : MonoBehaviour
         var cam = Camera.main.GetComponent<CameraFollow>();
         if (cam != null)
             cam.SetTarget(currentPlayer.transform);
-
+        var playerController = currentPlayer.GetComponent<PlayerController>();
+        if (playerController != null)
+        {
+            playerController.AssignJoystick(joystick);
+        }
         Debug.Log("⚠️ Player spawned at fallback center");
     }
 

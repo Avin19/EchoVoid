@@ -1,7 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
-    <ui:VisualElement name="root" picking-mode="Position">
-        <ui:VisualElement name="joystick-background">
-            <ui:VisualElement name="joystick-handle" />
-        </ui:VisualElement>
-    </ui:VisualElement>
-</ui:UXML>
