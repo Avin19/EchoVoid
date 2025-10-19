@@ -6,61 +6,124 @@ public class LevelTransitionManager : MonoBehaviour
 {
     public static LevelTransitionManager Instance;
 
+    [Header("Transition Settings")]
+    [Tooltip("Fade duration in seconds (unscaled time).")]
+    public float fadeDuration = 1f;
+
+    [Tooltip("Optional background color for transition.")]
+    public Color fadeColor = Color.black;
+
     private VisualElement fadeOverlay;
-    private bool isTransitioning = false;
+    private bool isFading;
 
     void Awake()
     {
         if (Instance == null)
+        {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
         else
+        {
             Destroy(gameObject);
+            return;
+        }
     }
 
     void Start()
     {
-        var root = GetComponent<UIDocument>().rootVisualElement;
-        fadeOverlay = root.Q<VisualElement>("fade-overlay");
+        // Find UI Document and create fade overlay
+        var uiDoc = GetComponent<UIDocument>();
+        if (uiDoc == null)
+        {
+            Debug.LogWarning("⚠️ No UIDocument attached to LevelTransitionManager!");
+            return;
+        }
 
-        // Start transparent
-        fadeOverlay.style.opacity = 0;
+        var root = uiDoc.rootVisualElement;
+        fadeOverlay = new VisualElement();
+        fadeOverlay.style.position = Position.Absolute;
+        fadeOverlay.style.top = 0;
+        fadeOverlay.style.left = 0;
+        fadeOverlay.style.right = 0;
+        fadeOverlay.style.bottom = 0;
+        fadeOverlay.style.backgroundColor = new StyleColor(fadeColor);
+        fadeOverlay.style.opacity = 0f;
         fadeOverlay.style.display = DisplayStyle.None;
+
+        root.Add(fadeOverlay);
     }
 
+    /// <summary>
+    /// Fades out, executes callback, then fades back in.
+    /// Works even when Time.timeScale = 0 (uses unscaled time).
+    /// </summary>
     public void FadeToNextLevel(System.Action onFadeComplete)
     {
-        if (isTransitioning) return;
-        StartCoroutine(FadeTransitionRoutine(onFadeComplete));
+        if (isFading)
+        {
+            Debug.Log("⏳ Transition already in progress...");
+            return;
+        }
+
+        StartCoroutine(FadeRoutine(onFadeComplete));
     }
 
-    private IEnumerator FadeTransitionRoutine(System.Action onFadeComplete)
+    private IEnumerator FadeRoutine(System.Action onFadeComplete)
     {
-        isTransitioning = true;
+        isFading = true;
+
         fadeOverlay.style.display = DisplayStyle.Flex;
-
-        // Fade Out
         float t = 0f;
-        while (t < 1f)
+
+        // Fade in (screen goes black)
+        while (t < fadeDuration)
         {
-            t += Time.deltaTime * 1.5f;
-            fadeOverlay.style.opacity = t;
+            t += Time.unscaledDeltaTime;
+            float alpha = Mathf.Clamp01(t / fadeDuration);
+            fadeOverlay.style.opacity = alpha;
             yield return null;
         }
 
-        onFadeComplete?.Invoke(); // Do the map regeneration here
+        fadeOverlay.style.opacity = 1f;
 
-        yield return new WaitForSeconds(0.3f);
+        // Small unscaled delay for clarity
+        yield return new WaitForSecondsRealtime(0.2f);
 
-        // Fade In
-        t = 1f;
-        while (t > 0f)
+        // Run callback (e.g. load next level, restart)
+        onFadeComplete?.Invoke();
+
+        // Fade out (reveal new scene)
+        t = 0f;
+        while (t < fadeDuration)
         {
-            t -= Time.deltaTime * 1.5f;
-            fadeOverlay.style.opacity = t;
+            t += Time.unscaledDeltaTime;
+            float alpha = Mathf.Clamp01(1f - (t / fadeDuration));
+            fadeOverlay.style.opacity = alpha;
             yield return null;
         }
 
+        fadeOverlay.style.opacity = 0f;
         fadeOverlay.style.display = DisplayStyle.None;
-        isTransitioning = false;
+
+        isFading = false;
+    }
+
+    /// <summary>
+    /// Instantly fade to black (for immediate transitions).
+    /// </summary>
+    public void ForceFadeIn()
+    {
+        fadeOverlay.style.display = DisplayStyle.Flex;
+        fadeOverlay.style.opacity = 1f;
+    }
+
+    /// <summary>
+    /// Instantly fade out (fully transparent).
+    /// </summary>
+    public void ForceFadeOut()
+    {
+        fadeOverlay.style.opacity = 0f;
+        fadeOverlay.style.display = DisplayStyle.None;
     }
 }

@@ -18,31 +18,66 @@ public class EchoMapManager : MonoBehaviour
     [Header("Tile Settings")]
     public Vector2 tileSize = Vector2.one;
 
+    [Header("UI References")]
+    public Joystick joystick;
+
     private EchoMap currentMap;
     private GameObject currentPlayer;
     private GameObject currentGoal;
-    [Header("UI References")]
-    public Joystick joystick;
-    void Start()
-    {
-        // GenerateMapAndSpawn();
-    }
+
+    private const int MAX_RETRY_ATTEMPTS = 5;
 
     // 💡 Main entry point — can be reused for next levels
     public void GenerateMapAndSpawn()
     {
-        // Clear previous map objects
+        StartCoroutine(GenerateMapRoutine());
+    }
+
+    private System.Collections.IEnumerator GenerateMapRoutine()
+    {
+        int attempt = 0;
+        bool validMap = false;
+
+        while (attempt < MAX_RETRY_ATTEMPTS && !validMap)
+        {
+            attempt++;
+            Debug.Log($"🧩 Generating map attempt {attempt}...");
+
+            ClearPreviousMap();
+
+            generator.seed = Random.Range(0, 999999);
+            currentMap = generator.Generate();
+            rend.Render(currentMap);
+
+            // Try spawning player + goal
+            validMap = TrySpawnPlayerAndGoal();
+
+            if (!validMap)
+            {
+                Debug.LogWarning($"⚠️ No valid path found on attempt {attempt}. Retrying...");
+                yield return null;
+            }
+        }
+
+        if (!validMap)
+        {
+            Debug.LogError("❌ Failed to generate a valid map after multiple attempts!");
+            // Fallback to a minimal map or safe center spawn
+            SpawnFallbackScenario();
+        }
+        else
+        {
+            Debug.Log("✅ Valid playable map generated successfully!");
+        }
+    }
+
+    // 🧹 Clears previous map, player, and goal
+    private void ClearPreviousMap()
+    {
         if (mapParent != null)
         {
             foreach (Transform child in mapParent)
                 Destroy(child.gameObject);
-        }
-
-        // 🔥 Ensure old player is removed
-        if (currentPlayer != null)
-        {
-            Destroy(currentPlayer);
-            currentPlayer = null;
         }
 
         if (playerParent != null)
@@ -51,114 +86,113 @@ public class EchoMapManager : MonoBehaviour
                 Destroy(child.gameObject);
         }
 
+        if (currentPlayer != null)
+        {
+            Destroy(currentPlayer);
+            currentPlayer = null;
+        }
+
         if (currentGoal != null)
         {
             Destroy(currentGoal);
             currentGoal = null;
         }
-
-        // Generate and render new map
-        generator.seed = Random.Range(0, 999999);
-        currentMap = generator.Generate();
-        rend.Render(currentMap);
-
-        // Place player first (before goal)
-        SpawnPlayerAtValidTile();
-
-        // Then place goal (so it gets player reference)
-        SpawnGoalAtValidTile();
     }
 
-
-    // 🎯 Spawns the player in a reachable, empty tile
-    void SpawnPlayerAtValidTile()
+    // 🎯 Attempts to spawn player and goal ensuring path connectivity
+    private bool TrySpawnPlayerAndGoal()
     {
-        Vector2Int goal = MapUtils.FindTile(currentMap, TileType.Goal);
-        if (goal.x == -1) goal = new Vector2Int(currentMap.width - 3, currentMap.height - 3);
-
+        // Collect all empty tiles
+        List<Vector2Int> emptyTiles = new List<Vector2Int>();
         for (int x = 1; x < currentMap.width - 1; x++)
         {
             for (int y = 1; y < currentMap.height - 1; y++)
-            {
-                Vector2Int tile = new Vector2Int(x, y);
-                if (currentMap.tiles[x, y] == TileType.Empty)
-                {
-                    if (MapUtils.IsReachable(currentMap, tile, goal))
-                    {
-                        Vector3 spawnWorld = MapUtils.TileToWorld(tile, tileSize);
-                        currentPlayer = Instantiate(playerPrefab, spawnWorld, Quaternion.identity, playerParent);
-
-                        // ✅ Assign camera target
-                        var cameraFollow = Camera.main.GetComponent<CameraFollow>();
-                        if (cameraFollow != null)
-                            cameraFollow.SetTarget(currentPlayer.transform);
-                        // ✅ Assign joystick reference
-
-                        var playerController1 = currentPlayer.GetComponent<PlayerController>();
-                        if (playerController1 != null)
-                        {
-                            playerController1.AssignJoystick(joystick);
-                        }
-                        Debug.Log($"✅ Player spawned at tile {tile}");
-                        return;
-                    }
-                }
-            }
-        }
-
-        // fallback center spawn
-        Vector3 fallbackPos = new Vector3(currentMap.width / 2, currentMap.height / 2, 0);
-        currentPlayer = Instantiate(playerPrefab, fallbackPos, Quaternion.identity, playerParent);
-        var cam = Camera.main.GetComponent<CameraFollow>();
-        if (cam != null)
-            cam.SetTarget(currentPlayer.transform);
-        var playerController = currentPlayer.GetComponent<PlayerController>();
-        if (playerController != null)
-        {
-            playerController.AssignJoystick(joystick);
-        }
-        Debug.Log("⚠️ Player spawned at fallback center");
-    }
-
-    // 🌟 Spawns goal on an empty tile
-    void SpawnGoalAtValidTile()
-    {
-        List<Vector2Int> emptyTiles = new List<Vector2Int>();
-        for (int x = 2; x < currentMap.width - 2; x++)
-        {
-            for (int y = 2; y < currentMap.height - 2; y++)
             {
                 if (currentMap.tiles[x, y] == TileType.Empty)
                     emptyTiles.Add(new Vector2Int(x, y));
             }
         }
 
-        if (emptyTiles.Count == 0)
+        if (emptyTiles.Count < 2)
         {
-            Debug.LogWarning("⚠️ No empty tiles available for goal placement!");
-            return;
+            Debug.LogWarning("⚠️ Not enough empty tiles to place player and goal!");
+            return false;
         }
 
         emptyTiles.Shuffle();
 
-        Vector2Int goalTile = emptyTiles[0];
-        currentMap.tiles[goalTile.x, goalTile.y] = TileType.Goal;
-
-        Vector3 goalWorld = MapUtils.TileToWorld(goalTile, tileSize);
-        GameObject goal = Instantiate(goalPrefab, goalWorld, Quaternion.identity, mapParent);
-
-        // ✅ Pass player reference if already spawned
-        if (currentPlayer != null)
+        // Randomly choose player and goal, ensure reachable
+        foreach (Vector2Int playerTile in emptyTiles)
         {
-            GoalController goalCtrl = goal.GetComponent<GoalController>();
-            if (goalCtrl != null)
+            foreach (Vector2Int goalTile in emptyTiles)
             {
-                goalCtrl.AssignPlayer(currentPlayer.transform);
+                if (playerTile == goalTile) continue;
+
+                if (MapUtils.IsReachable(currentMap, playerTile, goalTile))
+                {
+                    SpawnPlayerAtTile(playerTile);
+                    SpawnGoalAtTile(goalTile);
+                    return true;
+                }
             }
         }
 
-        currentGoal = goal;
-        Debug.Log($"🎯 Goal placed at tile {goalTile}");
+        return false;
     }
 
+    private void SpawnPlayerAtTile(Vector2Int tile)
+    {
+        Vector3 spawnWorld = MapUtils.TileToWorld(tile, tileSize);
+        currentPlayer = Instantiate(playerPrefab, spawnWorld, Quaternion.identity, playerParent);
+
+        // ✅ Assign camera target
+        var cameraFollow = Camera.main.GetComponent<CameraFollow>();
+        if (cameraFollow != null)
+            cameraFollow.SetTarget(currentPlayer.transform);
+
+        // ✅ Assign joystick
+        var playerController = currentPlayer.GetComponent<PlayerController>();
+        if (playerController != null)
+            playerController.AssignJoystick(joystick);
+
+        Debug.Log($"🧍 Player spawned at {tile}");
+    }
+
+    private void SpawnGoalAtTile(Vector2Int tile)
+    {
+        currentMap.tiles[tile.x, tile.y] = TileType.Goal;
+        Vector3 goalWorld = MapUtils.TileToWorld(tile, tileSize);
+        currentGoal = Instantiate(goalPrefab, goalWorld, Quaternion.identity, mapParent);
+
+        if (currentPlayer != null)
+        {
+            GoalController goalCtrl = currentGoal.GetComponent<GoalController>();
+            if (goalCtrl != null)
+                goalCtrl.AssignPlayer(currentPlayer.transform);
+        }
+
+        Debug.Log($"🎯 Goal placed at {tile}");
+    }
+
+    // 🆘 Fallback if generation fails completely
+    private void SpawnFallbackScenario()
+    {
+        Debug.LogWarning("⚠️ Spawning fallback scenario...");
+
+        ClearPreviousMap();
+
+        Vector3 fallbackPos = new Vector3(0, 0, 0);
+        currentPlayer = Instantiate(playerPrefab, fallbackPos, Quaternion.identity, playerParent);
+
+        Vector3 goalPos = fallbackPos + new Vector3(3f, 0f, 0f);
+        currentGoal = Instantiate(goalPrefab, goalPos, Quaternion.identity, mapParent);
+
+        var cam = Camera.main.GetComponent<CameraFollow>();
+        if (cam != null)
+            cam.SetTarget(currentPlayer.transform);
+
+        var playerController = currentPlayer.GetComponent<PlayerController>();
+        if (playerController != null)
+            playerController.AssignJoystick(joystick);
+    }
 }

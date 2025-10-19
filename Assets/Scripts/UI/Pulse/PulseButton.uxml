@@ -1,5 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/Scripts/UI/Pulse/PulseButton.uss?fileID=7433441132597879392&amp;guid=df02351ae1a5121478e66aa58473299d&amp;type=3#PulseButton" />
+    <Style src="project://database/Assets/Scripts/UI/Tutorial/TutorialUI.uss?fileID=7433441132597879392&amp;guid=510e999f6fd6d6449a2b32d58b366f75&amp;type=3#TutorialUI" />
     <ui:VisualElement name="pulse-button-root" class="pulse-root">
         <ui:Button name="pulse-button" class="pulse-button" />
     </ui:VisualElement>
