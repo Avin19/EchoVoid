@@ -44,6 +44,7 @@ public class ThemeSongGenerator : MonoBehaviour
     private double phaseMain, phaseEcho;
     private float pingTimer;
     private GameObject pingVisual;
+    private Vector3 goalLocation;
 
     // Thread-safe cached data
     private float cachedEnergyPercent = 1f;
@@ -55,6 +56,11 @@ public class ThemeSongGenerator : MonoBehaviour
             Instance = this;
         else
             Destroy(gameObject);
+    }
+
+    public void SetGoalLocation(Vector3 goolLoaction)
+    {
+        goalLocation = goolLoaction;
     }
 
     void Start()
@@ -202,6 +208,8 @@ public class ThemeSongGenerator : MonoBehaviour
             pingVisual.GetComponent<Renderer>().material.color = pingColor;
             pingVisual.name = "NeuralPingVisual";
             Destroy(pingVisual.GetComponent<Collider>());
+            if (goalLocation != null)
+                pingVisual.transform.SetParent(goalLocation);
         }
 
         StartCoroutine(PulseVisual());
