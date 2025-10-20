@@ -1,24 +1,16 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI/Game/HUD.uss?fileID=7433441132597879392&amp;guid=2ee25ca1cd42e134287b9981c519b8bf&amp;type=3#HUD" />
-
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xmlns="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/Game/HUD.uss?fileID=7433441132597879392&amp;guid=2ee25ca1cd42e134287b9981c519b8bf&amp;type=3#HUD" />
     <ui:VisualElement class="hud-root">
-
-        <!-- LEVEL -->
         <ui:Label name="level-label" text="LEVEL 1" class="hud-text level-label" />
-
-        <!-- SCORE -->
         <ui:VisualElement class="score-container">
             <ui:Label text="SCORE" class="hud-label" />
             <ui:Label name="score-label" text="0000" class="hud-value" />
         </ui:VisualElement>
-
-        <!-- ENERGY -->
         <ui:VisualElement class="energy-container">
             <ui:Label text="ENERGY" class="hud-label" />
             <ui:VisualElement name="energy-bar-bg" class="energy-bar-bg">
                 <ui:VisualElement name="energy-bar-fill" class="energy-bar-fill" />
             </ui:VisualElement>
         </ui:VisualElement>
-
     </ui:VisualElement>
 </ui:UXML>

@@ -431,6 +431,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e2605c18d886a14f91132b2b2b2eade, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  joystick: {fileID: 0}
+  player: {fileID: 0}
+  moveThreshold: 0.4
+  sustainSeconds: 0.35
 --- !u!114 &1278918244
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1072,6 +1076,14 @@ PrefabInstance:
       propertyPath: handleRange
       value: 45
       objectReference: {fileID: 0}
+    - target: {fileID: 6079207689859543538, guid: 05d849c7521146141a5842a454896f1d, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6079207689859543538, guid: 05d849c7521146141a5842a454896f1d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1323,7 +1335,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 812611731}
   - {fileID: 1750524175}
-  - {fileID: 1833136434}
   - {fileID: 2020991832848232944}
   - {fileID: 1355033739}
   - {fileID: 1336034323}
@@ -1335,3 +1346,4 @@ SceneRoots:
   - {fileID: 2066665936}
   - {fileID: 1985026968}
   - {fileID: 1781671087}
+  - {fileID: 1833136434}

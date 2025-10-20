@@ -1,55 +1,196 @@
-.tutorial-root {
+/* === ROOT CONTAINER === */
+.root {
     position: absolute;
-    width: 100%;
-    height: 100%;
     justify-content: center;
     align-items: center;
+    background-color: #000;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     flex-direction: column;
-    background-color: rgba(0, 0, 0, 0.4);
+    pointer-events: auto;
 }
 
+/* === RIPPLE BACKGROUND === */
+.ripple-bg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0px;
+    height: 0px;
+    border-radius: 50%;
+    border: 3px solid rgba(0, 255, 255, 0.8);
+    transform: translate(-50%, -50%);
+    animation-name: ripple;
+    animation-duration: 5s;
+    animation-timing-function: ease-out;
+    animation-iteration-count: infinite;
+    opacity: 0.8;
+}
+
+@keyframes ripple {
+    0% { width: 0px; height: 0px; opacity: 0.5; border-color: rgba(0,255,255,0.8); }
+    50% { opacity: 0.3; border-color: rgba(0,255,255,0.6); }
+    100% { width: 1600px; height: 1600px; opacity: 0; border-color: rgba(0,255,255,0); }
+}
+
+.delay1 { animation-delay: 1.5s; }
+.delay2 { animation-delay: 3s; }
+
+/* === NEON TEXT EFFECT === */
+@keyframes neonPulse {
+    0%, 100% {
+        text-shadow:
+            0 0 5px #00ffff,
+            0 0 10px #00ffff,
+            0 0 20px #00e6e6,
+            0 0 40px #00cccc,
+            0 0 60px #00b3b3;
+        opacity: 1;
+    }
+    50% {
+        text-shadow:
+            0 0 2px #00ffff,
+            0 0 6px #00ffff,
+            0 0 15px #00e6e6,
+            0 0 25px #00cccc,
+            0 0 35px #009999;
+        opacity: 0.95;
+    }
+}
+
+/* === TITLE === */
+.title {
+    font-size: 80px;
+    color: #00ffff;
+    unity-font-style: bold;
+    letter-spacing: 4px;
+    z-index: 2;
+    margin-bottom: 30px;
+    animation: neonPulse 2.5s infinite ease-in-out;
+    text-align: center;
+}
+
+/* === TUTORIAL PANEL === */
 .tutorial-panel {
-    padding: 16px 24px;
-    border-radius: 8px;
+    z-index: 2;
     background-color: rgba(0, 0, 0, 0.6);
-    border: 2px solid #00ffff;
-    margin-bottom: 20px;
+    border: 1px solid rgba(0,255,255,0.25);
+    border-radius: 12px;
+    padding: 20px;
+    width: 80%;
+    max-width: 900px;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 0 30px rgba(0,255,255,0.15);
+    animation: fadeIn 1s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* === MAIN INSTRUCTION TEXT === */
+.tutorial-text-box {
+    padding: 15px;
+    background-color: rgba(0, 255, 255, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(0,255,255,0.25);
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px rgba(0,255,255,0.15);
 }
 
 .tutorial-text {
-    color: #00ffff;
-    font-size: 24px;
+    color: #aaffff;
+    font-size: 20px;
     text-align: center;
-    text-shadow: 0 0 6px #00ffff;
+    margin: 10px;
+    animation: neonPulse 3s infinite ease-in-out;
 }
 
-.icon-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
+/* === STEP CONTAINERS === */
+.steps {
+    margin-top: 25px;
+    gap: 10px;
+    flex-direction: column;
     align-items: center;
-    margin-bottom: 20px;
+    width: 100%;
 }
 
-.move-icon, .pulse-icon {
-    width: 64px;
-    height: 64px;
-    margin: 8px;
-    background-size: contain;
-    background-repeat: no-repeat;
-}
-
-.move-icon {
-    background-image: url("project://database/Assets/UI/Icons/move_arrows.png");
-}
-
-.pulse-icon {
-    background-image: url("project://database/Assets/UI/Icons/pulse_icon.png");
-}
-
-.hint-label {
-    color: #888;
-    font-size: 16px;
-    margin-top: 10px;
+.step {
+    background-color: rgba(0, 255, 255, 0.05);
+    border: 1px solid rgba(0, 255, 255, 0.15);
+    padding: 10px;
+    border-radius: 8px;
+    width: 90%;
     text-align: center;
+    box-shadow: 0 0 20px rgba(0,255,255,0.05);
+}
+
+/* === STEP TEXT === */
+.step-title {
+    color: #7ff;
+    font-size: 20px;
+    unity-font-style: bold;
+    margin-bottom: 5px;
+    animation: neonPulse 2.2s infinite ease-in-out;
+}
+
+.step-desc {
+    color: #ccffff;
+    font-size: 16px;
+    opacity: 0.9;
+    text-shadow:
+        0 0 6px #00ffff,
+        0 0 12px #00e6e6;
+}
+
+/* === BUTTON === */
+.menu-button {
+    margin-top: 20px;
+    width: 280px;
+    height: 50px;
+    font-size: 22px;
+    color: #00ffff;
+    border: 2px solid #00ffff;
+    border-radius: 10px;
+    background-color: rgba(0, 255, 255, 0.05);
+    text-shadow:
+        0 0 8px #00ffff,
+        0 0 16px #00cccc;
+    box-shadow: 0 0 25px rgba(0,255,255,0.1);
+    transition: all 0.25s ease-in-out;
+}
+
+.menu-button:hover {
+    background-color: rgba(0, 255, 255, 0.15);
+    color: white;
+    text-shadow:
+        0 0 10px #00ffff,
+        0 0 25px #00cccc,
+        0 0 40px #00b3b3;
+    box-shadow: 0 0 35px rgba(0,255,255,0.3);
+    cursor: pointer;
+}
+
+.menu-button:active {
+    background-color: rgba(0, 255, 255, 0.3);
+    color: #ffffff;
+    transform: scale(0.97);
+    transition-duration: 0.1s;
+}
+
+/* === FOOTER === */
+.footer {
+    position: absolute;
+    bottom: 10px;
+    right: 15px;
+    color: rgba(0, 255, 255, 0.35);
+    font-size: 12px;
+    z-index: 2;
+    text-shadow: 0 0 10px rgba(0,255,255,0.4);
 }

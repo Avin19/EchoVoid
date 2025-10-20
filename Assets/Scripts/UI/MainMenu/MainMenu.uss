@@ -54,13 +54,13 @@
 
 /* === TITLE TEXT === */
 .title {
-    font-size: 64px;
+    font-size: 100px;
     color: #00ffff;
     unity-font-style: bold;
     text-shadow: 0 0 15px #00ffff;
-    letter-spacing: 3px;
+    letter-spacing: 5px;
     z-index: 2;
-    margin-bottom: 40px;
+    margin-bottom: 100px;
     animation-name: pulseGlow;
     animation-duration: 3s;
     animation-iteration-count: infinite;
@@ -78,17 +78,18 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 16px;
+    gap: 50px;
     z-index: 2;
 }
 
 .menu-button {
-    width: 220px;
-    height: 50px;
-    font-size: 22px;
+    width: 500px;
+    height: 75px;
+    font-size: 40px;
     color: #00ffff;
     border-width: 2px;
     border-color: #00ffff;
+    margin: 10px;
     border-radius: 10px;
     background-color: rgba(0, 255, 255, 0.05);
     text-shadow: 0 0 5px #00ffff;
