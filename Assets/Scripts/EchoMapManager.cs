@@ -154,6 +154,8 @@ public class EchoMapManager : MonoBehaviour
             if (goalCtrl != null)
             {
                 goalCtrl.AssignPlayer(currentPlayer.transform);
+                ThemeSongGenerator.Instance?.SetGoal(goalCtrl.transform);
+
             }
         }
 

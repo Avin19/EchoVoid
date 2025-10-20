@@ -47,8 +47,6 @@ public class PlayerController : MonoBehaviour
 #endif
 
         // Debug joystick values
-        if (joystick != null)
-            Debug.Log($"Joystick Direction: {joystick.Direction}");
 
         // ✅ Emit pulse
         if (Input.GetKeyDown(KeyCode.Space))
