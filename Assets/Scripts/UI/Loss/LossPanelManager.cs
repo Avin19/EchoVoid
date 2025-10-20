@@ -49,28 +49,11 @@ public class LossPanelManager : MonoBehaviour
 
     private void OnWatchAdClicked()
     {
-        if (AdManager.Instance == null)
-        {
-            Debug.LogWarning("⚠️ AdManager not initialized yet!");
-            adStatusLabel.text = "Ad system not ready.";
-            return;
-        }
+        Debug.Log("⚠️ Rewarded ad not ready!");
+        adStatusLabel.text = "Ad not ready yet. Try again soon.";
+        watchAdButton.SetEnabled(false);
+        Invoke(nameof(UpdateAdButtonState), 3f);
 
-        // Try showing ad
-        if (AdManager.Instance.IsRewardedReady())
-        {
-            Debug.Log("🎥 Showing rewarded ad...");
-            adStatusLabel.text = "Loading ad...";
-            HideLossPanel();
-            AdManager.Instance.ShowRewardedAd();
-        }
-        else
-        {
-            Debug.Log("⚠️ Rewarded ad not ready!");
-            adStatusLabel.text = "Ad not ready yet. Try again soon.";
-            watchAdButton.SetEnabled(false);
-            Invoke(nameof(UpdateAdButtonState), 3f);
-        }
     }
 
     private void OnRestartClicked()
@@ -82,17 +65,10 @@ public class LossPanelManager : MonoBehaviour
 
     private void UpdateAdButtonState()
     {
-        if (AdManager.Instance != null && AdManager.Instance.IsRewardedReady())
-        {
-            watchAdButton.SetEnabled(true);
-            watchAdButton.text = "▶ Watch Ad to Continue";
-            adStatusLabel.text = "";
-        }
-        else
-        {
-            watchAdButton.SetEnabled(false);
-            watchAdButton.text = "Loading Ad...";
-            adStatusLabel.text = "Preparing ad...";
-        }
+
+        watchAdButton.SetEnabled(false);
+        watchAdButton.text = "Loading Ad...";
+        adStatusLabel.text = "Preparing ad...";
+
     }
 }
