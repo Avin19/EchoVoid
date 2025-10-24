@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using System.Collections;
 
 /// <summary>
 /// Dynamic procedural soundtrack generator for "Echo Void"
@@ -48,6 +49,7 @@ public class ThemeSongGenerator : MonoBehaviour
     // Thread-safe cached data
     private float cachedEnergyPercent = 1f;
     private readonly object energyLock = new object();
+    private Transform goalTransform;
 
     void Awake()
     {
@@ -109,6 +111,11 @@ public class ThemeSongGenerator : MonoBehaviour
             }
         }
     }
+    public void SetGoal(Transform goal)
+    {
+        goalTransform = goal;
+    }
+
 
     // 🎵 Procedural Audio (runs on audio thread)
     private void OnAudioRead(float[] data)
@@ -172,6 +179,7 @@ public class ThemeSongGenerator : MonoBehaviour
     // 💥 Neural ping tone + visual
     void PlayPing()
     {
+        if (goalTransform == null) return;
         // short audio blip
         var src = gameObject.AddComponent<AudioSource>();
         src.volume = 0.15f;
@@ -190,6 +198,10 @@ public class ThemeSongGenerator : MonoBehaviour
         }
         clip.SetData(data, 0);
         src.clip = clip;
+        AudioSource.PlayClipAtPoint(GeneratePing(), goalTransform.position, 0.6f);
+
+        // Start visual pulse at goal
+        StartCoroutine(PulseVisual());
         src.Play();
         Destroy(src, 1f);
 
@@ -197,7 +209,7 @@ public class ThemeSongGenerator : MonoBehaviour
         if (pingVisual == null)
         {
             pingVisual = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            pingVisual.transform.localScale = Vector3.one * 0.1f;
+            pingVisual.transform.localScale = Vector3.one * 6f;
             pingVisual.GetComponent<Renderer>().material = new Material(Shader.Find("Unlit/Color"));
             pingVisual.GetComponent<Renderer>().material.color = pingColor;
             pingVisual.name = "NeuralPingVisual";
@@ -206,25 +218,96 @@ public class ThemeSongGenerator : MonoBehaviour
 
         StartCoroutine(PulseVisual());
     }
-
-    System.Collections.IEnumerator PulseVisual()
+    private AudioClip GeneratePing()
     {
-        if (pingVisual == null) yield break;
-        pingVisual.transform.position = Vector3.zero;
+        int sampleRate = 44100;                // Standard audio rate
+        int sampleCount = sampleRate / 4;      // 0.25 second ping
+        float[] data = new float[sampleCount];
+
+        // Pick a random frequency for variation (between 400–1200 Hz)
+        float freq = UnityEngine.Random.Range(400f, 1200f);
+        float phase = 0f;
+
+        for (int i = 0; i < data.Length; i++)
+        {
+            float t = i / (float)sampleRate;
+
+            // Exponential decay envelope (starts loud, fades fast)
+            float envelope = Mathf.Exp(-t * 6f);
+
+            // Pure sine wave modulated by envelope
+            data[i] = Mathf.Sin(phase) * envelope;
+
+            // Increment phase for the sine
+            phase += 2 * Mathf.PI * freq / sampleRate;
+        }
+
+        // Create an AudioClip from generated samples
+        AudioClip clip = AudioClip.Create("Ping", sampleCount, 1, sampleRate, false);
+        clip.SetData(data, 0);
+
+        return clip;
+    }
+
+    private IEnumerator PulseVisual()
+    {
+        if (goalTransform == null) yield break;
+
+        // Create visual if missing
+        if (pingVisual == null)
+        {
+            pingVisual = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            pingVisual.name = "NeuralPingVisual";
+            Destroy(pingVisual.GetComponent<Collider>());
+
+            var mat = new Material(Shader.Find("Unlit/Color"));
+            mat.color = new Color(pingColor.r, pingColor.g, pingColor.b, 0.8f);
+            pingVisual.GetComponent<Renderer>().material = mat;
+            pingVisual.GetComponent<Renderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            pingVisual.layer = LayerMask.NameToLayer("UI");
+            pingVisual.transform.rotation = Quaternion.Euler(0f, 0f, 0f);// ensure visible
+        }
+
+        var player = FindObjectOfType<PlayerController>();
+        if (player == null) yield break;
+
+        // Start at goal
+        pingVisual.transform.position = goalTransform.position + Vector3.up * 0.05f;
         pingVisual.transform.localScale = Vector3.zero;
         pingVisual.SetActive(true);
 
+        // Distance from player to goal affects scale and fade
+        float dist = Vector3.Distance(goalTransform.position, player.transform.position);
+        float maxScale = Mathf.Clamp(dist * 2f, 3f, 20f);
+        float maxAlpha = Mathf.Lerp(1f, 0.3f, Mathf.InverseLerp(0f, 25f, dist));
+
+        // Smooth expand and fade
         float time = 0f;
+        var matRef = pingVisual.GetComponent<Renderer>().material;
+
         while (time < 1f)
         {
-            time += Time.deltaTime;
-            float scale = Mathf.Lerp(0f, 2f, time);
-            float alpha = 1f - time;
+            time += Time.deltaTime * 1.2f;
+            float t = Mathf.SmoothStep(0f, 1f, time);
+
+            // Expanding circle
+            float scale = Mathf.Lerp(0f, maxScale, t);
             pingVisual.transform.localScale = Vector3.one * scale;
-            var mat = pingVisual.GetComponent<Renderer>().material;
-            mat.color = new Color(pingColor.r, pingColor.g, pingColor.b, alpha * 0.6f);
+
+            // Always face camera (billboard)
+            if (Camera.main != null)
+                pingVisual.transform.LookAt(Camera.main.transform);
+
+            // Fade alpha
+            float alpha = Mathf.Lerp(maxAlpha, 0f, t);
+            matRef.color = new Color(pingColor.r, pingColor.g, pingColor.b, alpha);
+
+
             yield return null;
         }
+
         pingVisual.SetActive(false);
     }
+
+
 }

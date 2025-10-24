@@ -169,6 +169,9 @@ public class EchoMapManager : MonoBehaviour
             GoalController goalCtrl = currentGoal.GetComponent<GoalController>();
             if (goalCtrl != null)
                 goalCtrl.AssignPlayer(currentPlayer.transform);
+                ThemeSongGenerator.Instance?.SetGoal(goalCtrl.transform);
+
+            }
         }
 
         Debug.Log($"🎯 Goal placed at {tile}");

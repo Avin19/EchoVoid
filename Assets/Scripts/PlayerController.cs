@@ -46,6 +46,7 @@ public class PlayerController : MonoBehaviour
         input.y = Input.GetAxisRaw("Vertical");
 #endif
 
+        // Debug joystick values
 
         // ✅ Emit pulse
         if (Input.GetKeyDown(KeyCode.Space))

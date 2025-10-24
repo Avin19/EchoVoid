@@ -1,0 +1,36 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/MainUI/GameUI.uss?fileID=7433441132597879392&amp;guid=597839e5ce7be874ab9fcdea71650f60&amp;type=3#GameUI" />
+    <ui:VisualElement name="ui-root" class="ui-root">
+        <ui:VisualElement name="hud-root" class="hud-root">
+            <ui:Label name="level-label" text="LEVEL 1" class="hud-text level-label" />
+            <ui:VisualElement class="score-container">
+                <ui:Label text="SCORE" class="hud-label" />
+                <ui:Label name="score-label" text="0000" class="hud-value" />
+            </ui:VisualElement>
+            <ui:VisualElement class="energy-container">
+                <ui:Label text="ENERGY" class="hud-label" />
+                <ui:VisualElement name="energy-bar-bg" class="energy-bar-bg">
+                    <ui:VisualElement name="energy-bar-fill" class="energy-bar-fill" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Button name="pause-button" text="⏸" class="pause-btn" />
+        </ui:VisualElement>
+        <ui:VisualElement name="pause-panel" class="pause-panel" style="display: none;">
+            <ui:Label text="PAUSED" class="pause-title" />
+            <ui:Button name="resume-button" text="RESUME" class="pause-option" />
+            <ui:Button name="mainmenu-button" text="MAIN MENU" class="pause-option" />
+            <ui:Button name="exit-button" text="EXIT" class="pause-option" />
+        </ui:VisualElement>
+        <ui:VisualElement name="win-root" class="win-root" style="display: none;">
+            <ui:Label name="win-score" text="SCORE: 0000" class="win-score" />
+            <ui:Button name="next-level-button" text="NEXT LEVEL" class="win-button" />
+            <ui:Button name="reward-button" text="WATCH AD" class="win-button" />
+        </ui:VisualElement>
+        <ui:VisualElement name="tutorial-root" class="tutorial-root" style="display: none;">
+            <ui:VisualElement class="tutorial-panel">
+                <ui:Label name="tutorial-text" text="Use Joystick to Move and Tap to Pulse Sound Waves" class="tutorial-text" />
+            </ui:VisualElement>
+            <ui:Label name="hint-label" text="Find the echo that leads to the goal..." class="hint-label" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

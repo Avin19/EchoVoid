@@ -3,11 +3,12 @@ using UnityEngine.UIElements;
 
 public class UIManager : MonoBehaviour
 {
-    public static UIManager Instance;
+    public static UIManager Instance { get; private set; }
 
     private Label levelLabel;
     private Label scoreLabel;
     private VisualElement energyFill;
+    private VisualElement root;
 
     private int currentEnergy = 10;
     private int maxEnergy = 10;
@@ -15,25 +16,22 @@ public class UIManager : MonoBehaviour
     public int CurrentScore { get; private set; } = 0;
     public int CurrentLevel { get; private set; } = 1;
 
-    // ✅ Add these read-only properties:
     public int CurrentEnergy => currentEnergy;
     public int MaxEnergy => maxEnergy;
 
     void Awake()
     {
-        // ✅ Singleton setup
-        if (Instance == null)
-            Instance = this;
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
             return;
         }
+        Instance = this;
     }
 
     void Start()
     {
-        var root = GetComponent<UIDocument>().rootVisualElement;
+        root = GetComponent<UIDocument>().rootVisualElement;
 
         levelLabel = root.Q<Label>("level-label");
         scoreLabel = root.Q<Label>("score-label");
@@ -44,7 +42,7 @@ public class UIManager : MonoBehaviour
         UpdateEnergy(currentEnergy, maxEnergy);
     }
 
-    // 🎯 LEVEL
+    // 🧭 LEVEL
     public void UpdateLevel(int level)
     {
         CurrentLevel = level;
@@ -60,10 +58,7 @@ public class UIManager : MonoBehaviour
             scoreLabel.text = CurrentScore.ToString("0000");
     }
 
-    public void AddScore(int amount)
-    {
-        UpdateScore(CurrentScore + amount);
-    }
+    public void AddScore(int amount) => UpdateScore(CurrentScore + amount);
 
     // ⚡ ENERGY
     public void UpdateEnergy(int current, int max)
@@ -77,42 +72,31 @@ public class UIManager : MonoBehaviour
         float pct = Mathf.Clamp01((float)current / max);
         energyFill.style.width = new Length(pct * 100, LengthUnit.Percent);
 
-        // Color feedback
+        // Dynamic color feedback
         if (pct < 0.2f)
             energyFill.style.backgroundColor = new StyleColor(Color.red);
         else
-            energyFill.style.backgroundColor = new StyleColor(new Color(0f, 1f, 1f));
+            energyFill.style.backgroundColor = new StyleColor(new Color(0f, 1f, 1f)); // cyan
     }
 
-    // 🔄 RESET (used by GameManager between levels)
     public void ResetUIForNewLevel()
     {
         UpdateLevel(CurrentLevel);
         UpdateEnergy(maxEnergy, maxEnergy);
     }
 
-    // 💥 OPTIONAL — external getters
-    public int GetEnergy() => currentEnergy;
-    public int GetMaxEnergy() => maxEnergy;
-    // 👇 Add this at the bottom of your UIManager class
+    // 🔄 HUD Visibility
     public void ShowHUD()
     {
-        var root = GetComponent<UIDocument>().rootVisualElement;
-        if (root != null)
-        {
-            root.style.display = DisplayStyle.Flex;
-            root.style.opacity = 1f;
-        }
+        if (root == null) root = GetComponent<UIDocument>().rootVisualElement;
+        root.style.display = DisplayStyle.Flex;
+        root.style.opacity = 1f;
     }
 
     public void HideHUD()
     {
-        var root = GetComponent<UIDocument>().rootVisualElement;
-        if (root != null)
-        {
-            root.style.display = DisplayStyle.None;
-            root.style.opacity = 0f;
-        }
+        if (root == null) root = GetComponent<UIDocument>().rootVisualElement;
+        root.style.display = DisplayStyle.None;
+        root.style.opacity = 0f;
     }
-
 }

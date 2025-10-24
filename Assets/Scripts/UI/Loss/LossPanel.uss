@@ -10,7 +10,7 @@
 }
 
 .loss-panel {
-    width: 350px;
+    width: 500px;
     padding: 20px;
     border-radius: 12px;
     background-color: rgba(0, 20, 30, 0.9);

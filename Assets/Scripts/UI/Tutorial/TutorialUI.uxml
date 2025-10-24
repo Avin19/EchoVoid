@@ -1,21 +1,30 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements">
-    <Style src="project://database/Assets/UI/Tutorial/TutorialUI.uss" />
-
-    <ui:VisualElement class="tutorial-root">
-
-        <!-- Text Box -->
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xmlns="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/Tutorial/TutorialUI.uss?fileID=7433441132597879392&amp;guid=510e999f6fd6d6449a2b32d58b366f75&amp;type=3#TutorialUI" />
+    <ui:VisualElement name="tutorial-root" class="root">
+        <ui:VisualElement class="ripple-bg" />
+        <ui:VisualElement class="ripple-bg delay1" />
+        <ui:VisualElement class="ripple-bg delay2" />
         <ui:VisualElement class="tutorial-panel">
-            <ui:Label name="tutorial-text" class="tutorial-text" text="Move using WASD or Arrow Keys" />
+            <ui:Label name="title" text="TUTORIAL" class="title" />
+            <ui:VisualElement class="tutorial-text-box">
+                <ui:Label name="tutorial-text" text="Use the joystick to move through the darkness. Tap the screen to emit a pulse and reveal walls." class="tutorial-text" />
+            </ui:VisualElement>
+            <ui:VisualElement class="steps">
+                <ui:VisualElement name="step-move" class="step">
+                    <ui:Label text="STEP 1 — MOVE" class="step-title" />
+                    <ui:Label text="Use the joystick (or WASD) to move around." class="step-desc" />
+                </ui:VisualElement>
+                <ui:VisualElement name="step-pulse" class="step" style="display: none;">
+                    <ui:Label text="STEP 2 — PULSE" class="step-title" />
+                    <ui:Label text="Tap the screen or press SPACE to emit sound and reveal obstacles." class="step-desc" />
+                </ui:VisualElement>
+                <ui:VisualElement name="step-done" class="step" style="display: none;">
+                    <ui:Label text="MISSION START" class="step-title" />
+                    <ui:Label text="Now find the glowing goal and escape the void." class="step-desc" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Button name="skip-button" text="Skip Tutorial" class="menu-button" />
         </ui:VisualElement>
-
-        <!-- Icons (for visual cue) -->
-        <ui:VisualElement class="icon-container">
-            <ui:VisualElement name="move-icon" class="move-icon" />
-            <ui:VisualElement name="pulse-icon" class="pulse-icon" style="display: none;" />
-        </ui:VisualElement>
-
-        <!-- Continue Hint -->
-        <ui:Label name="hint-label" class="hint-label" text="Perform the action to continue..." />
+        <ui:Label text="Echo Void • Neural Systems" class="footer" />
     </ui:VisualElement>
 </ui:UXML>
-
