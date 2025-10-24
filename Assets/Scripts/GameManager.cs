@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public enum GameState
 {
@@ -69,29 +70,32 @@ public class GameManager : MonoBehaviour
     // 🎯 When player reaches goal
     public void OnGoalReached()
     {
-        if (currentState != GameState.Playing) return; // ✅ Prevent overlap
+        if (currentState != GameState.Playing) return;
         SetState(GameState.Won);
 
         Debug.Log($"🎉 Level {currentLevel} complete!");
-        Time.timeScale = 0f;
+        StartCoroutine(ShowWinPanelDelayed());
+    }
+
+    private IEnumerator ShowWinPanelDelayed()
+    {
+        yield return new WaitForSeconds(0.5f); // small delay for effect
 
         int score = UIManager.Instance != null ? UIManager.Instance.CurrentScore : 0;
-
-        // Hide any active loss UI (safety)
         LossPanelManager.Instance?.HideLossPanel();
-
-        // Show win panel
         WinPanelManager.Instance?.ShowWinPanel(score);
-
-        // 🔔 Notify any listeners
         OnGoalReachedEvent?.Invoke();
+        Time.timeScale = 0f;
     }
+
 
     // ⚡ Move to the next level
     public void NextLevel()
     {
         if (currentState == GameState.Transitioning) return;
         SetState(GameState.Transitioning);
+
+        // ✅ Make sure the game isn’t paused before transition
         Time.timeScale = 1f;
 
         currentLevel++;
@@ -103,6 +107,7 @@ public class GameManager : MonoBehaviour
             StartLevel();
         });
     }
+
 
     // 💀 When energy depletes
     public void OnPlayerEnergyDepleted()
@@ -118,6 +123,7 @@ public class GameManager : MonoBehaviour
 
         // Show loss panel
         LossPanelManager.Instance?.ShowLossPanel();
+
     }
 
     // 🔄 Restart current level
@@ -151,17 +157,20 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("🎁 Continue after ad watched!");
 
-        // Reset state
         SetState(GameState.Playing);
         Time.timeScale = 1f;
 
-        // Refill energy + hide panels
         var player = FindObjectOfType<PlayerController>();
         player?.RestoreFullEnergy();
 
         WinPanelManager.Instance?.HideWinPanel();
         LossPanelManager.Instance?.HideLossPanel();
+
+        // ✅ Ensure level isn’t frozen in post-win mode
+        if (HasReachedGoal)
+            StartLevel();
     }
+
 
     // 👀 Helper for player input
     public bool IsPlaying() => currentState == GameState.Playing;
@@ -172,5 +181,12 @@ public class GameManager : MonoBehaviour
         if (currentState == newState) return;
         currentState = newState;
         Debug.Log($"📜 GameState changed to: {currentState}");
+    }
+    [ContextMenu("Force Replay Level")]
+    public void DebugReplayLevel()
+    {
+        Debug.Log("🧪 Replaying current level manually...");
+        SetState(GameState.Playing);
+        StartLevel();
     }
 }
