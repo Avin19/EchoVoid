@@ -30,7 +30,7 @@ public class ThemeSongGenerator : MonoBehaviour
 
     [Header("Neural Ping Settings")]
     public bool enablePings = true;
-    public float pingInterval = 8f;
+    public float pingInterval = 3f;
     public Color pingColor = new Color(0f, 1f, 1f, 1f);
 
     [Header("Organic Drift Settings")]
@@ -198,7 +198,7 @@ public class ThemeSongGenerator : MonoBehaviour
         }
         clip.SetData(data, 0);
         src.clip = clip;
-        AudioSource.PlayClipAtPoint(GeneratePing(), goalTransform.position, 0.6f);
+        AudioSource.PlayClipAtPoint(GeneratePing(), goalTransform.position, 0.1f);
 
         // Start visual pulse at goal
         StartCoroutine(PulseVisual());
@@ -210,7 +210,7 @@ public class ThemeSongGenerator : MonoBehaviour
         {
             pingVisual = GameObject.CreatePrimitive(PrimitiveType.Quad);
             pingVisual.transform.localScale = Vector3.one * 6f;
-            pingVisual.GetComponent<Renderer>().material = new Material(Shader.Find("Unlit/Color"));
+            pingVisual.GetComponent<Renderer>().material = new Material(Shader.Find("EchoVoid/EchoPulse"));
             pingVisual.GetComponent<Renderer>().material.color = pingColor;
             pingVisual.name = "NeuralPingVisual";
             Destroy(pingVisual.GetComponent<Collider>());
@@ -260,12 +260,12 @@ public class ThemeSongGenerator : MonoBehaviour
             pingVisual.name = "NeuralPingVisual";
             Destroy(pingVisual.GetComponent<Collider>());
 
-            var mat = new Material(Shader.Find("Unlit/Color"));
-            mat.color = new Color(pingColor.r, pingColor.g, pingColor.b, 0.8f);
+            var mat = new Material(Shader.Find("Mobile/Particles/Additive"));
+            mat.color = new Color(pingColor.r, pingColor.g, pingColor.b, 0.2f);
             pingVisual.GetComponent<Renderer>().material = mat;
             pingVisual.GetComponent<Renderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             pingVisual.layer = LayerMask.NameToLayer("UI");
-            pingVisual.transform.rotation = Quaternion.Euler(0f, 0f, 0f);// ensure visible
+            // ensure visible
         }
 
         var player = FindObjectOfType<PlayerController>();
@@ -278,7 +278,7 @@ public class ThemeSongGenerator : MonoBehaviour
 
         // Distance from player to goal affects scale and fade
         float dist = Vector3.Distance(goalTransform.position, player.transform.position);
-        float maxScale = Mathf.Clamp(dist * 2f, 3f, 20f);
+        float maxScale = Mathf.Clamp(dist, 3f, 20f);
         float maxAlpha = Mathf.Lerp(1f, 0.3f, Mathf.InverseLerp(0f, 25f, dist));
 
         // Smooth expand and fade
@@ -291,7 +291,7 @@ public class ThemeSongGenerator : MonoBehaviour
             float t = Mathf.SmoothStep(0f, 1f, time);
 
             // Expanding circle
-            float scale = Mathf.Lerp(0f, maxScale, t);
+            float scale = Mathf.Lerp(0f, maxScale * 3f, t);
             pingVisual.transform.localScale = Vector3.one * scale;
 
             // Always face camera (billboard)

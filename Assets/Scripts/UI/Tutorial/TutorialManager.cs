@@ -49,10 +49,8 @@ public class TutorialUI : MonoBehaviour
         stepMove = root.Q<VisualElement>("step-move");
         stepPulse = root.Q<VisualElement>("step-pulse");
         stepDone = root.Q<VisualElement>("step-done");
-        skipButton = root.Q<Button>("skip-button");
 
-        if (skipButton != null)
-            skipButton.clicked += SkipTutorial;
+
 
         // Ensure player/joystick references if not assigned
         if (joystick == null)
@@ -110,43 +108,10 @@ public class TutorialUI : MonoBehaviour
 
         // Listen for pulse action
         // If you have a pulse button in UI, we could query it; instead we listen for SPACE or call TryEmitPulse.
-        StartCoroutine(MonitorPulseStep());
+        Invoke(nameof(StepPulseSucceeded), 2f);
     }
 
-    IEnumerator MonitorPulseStep()
-    {
-        // If they tap pulse button (UI) you'd wire that button's clicked to TriggerPulse() from elsewhere.
-        // We'll monitor both SPACE and a call to TriggerPulseFromPlayer() (set by player when pulse is emitted)
 
-        while (!stepPulseCompleted)
-        {
-            // Check for SPACE
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                // If PlayerController exists, call TryEmitPulse on it to keep behavior consistent
-                player?.TryEmitPulse();
-                StepPulseSucceeded();
-                break;
-            }
-
-            // Also check for touch: tapping anywhere on right-side of screen could be considered a pulse.
-#if UNITY_ANDROID || UNITY_IOS
-            if (Input.touchCount > 0)
-            {
-                Touch t = Input.GetTouch(0);
-                // right half screen tap counts as pulse
-                if (t.phase == TouchPhase.Began && t.position.x > Screen.width * 0.5f)
-                {
-                    player?.TryEmitPulse();
-                    StepPulseSucceeded();
-                    break;
-                }
-            }
-#endif
-
-            yield return null;
-        }
-    }
 
     void StepPulseSucceeded()
     {
