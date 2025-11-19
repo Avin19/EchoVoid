@@ -50,6 +50,7 @@ public class ThemeSongGenerator : MonoBehaviour
     private float cachedEnergyPercent = 1f;
     private readonly object energyLock = new object();
     private Transform goalTransform;
+    private PlayerController cachedPlayer;
 
     void Awake()
     {
@@ -57,6 +58,15 @@ public class ThemeSongGenerator : MonoBehaviour
             Instance = this;
         else
             Destroy(gameObject);
+    }
+
+    void OnDestroy()
+    {
+        // Clear singleton reference when destroyed
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 
     void Start()
@@ -101,12 +111,15 @@ public class ThemeSongGenerator : MonoBehaviour
         // ✅ Cache energy safely from main thread
         if (reactiveToEnergy && GameManager.Instance != null)
         {
-            var player = FindObjectOfType<PlayerController>();
-            if (player != null)
+            // Cache player reference if not already cached
+            if (cachedPlayer == null)
+                cachedPlayer = FindObjectOfType<PlayerController>();
+            
+            if (cachedPlayer != null)
             {
                 lock (energyLock)
                 {
-                    cachedEnergyPercent = Mathf.Clamp01((float)player.GetEnergy() / player.maxEnergy);
+                    cachedEnergyPercent = Mathf.Clamp01((float)cachedPlayer.GetEnergy() / cachedPlayer.maxEnergy);
                 }
             }
         }
@@ -180,42 +193,12 @@ public class ThemeSongGenerator : MonoBehaviour
     void PlayPing()
     {
         if (goalTransform == null) return;
-        // short audio blip
-        var src = gameObject.AddComponent<AudioSource>();
-        src.volume = 0.15f;
-        src.spatialBlend = 0f;
-        int sampleCount = 44100 / 4; // 0.25 sec
-        var clip = AudioClip.Create("Ping", sampleCount, 1, 44100, false);
-        float[] data = new float[sampleCount];
-        float freq = UnityEngine.Random.Range(400f, 1200f);
-        float phase = 0;
-        for (int i = 0; i < data.Length; i++)
-        {
-            float t = i / 44100f;
-            float env = Mathf.Exp(-t * 6f);
-            data[i] = Mathf.Sin(phase) * env;
-            phase += 2 * Mathf.PI * freq / 44100f;
-        }
-        clip.SetData(data, 0);
-        src.clip = clip;
-        AudioSource.PlayClipAtPoint(GeneratePing(), goalTransform.position, 0.1f);
+        
+        // Play audio ping at goal position
+        AudioClip pingClip = GeneratePing();
+        AudioSource.PlayClipAtPoint(pingClip, goalTransform.position, 0.15f);
 
         // Start visual pulse at goal
-        StartCoroutine(PulseVisual());
-        src.Play();
-        Destroy(src, 1f);
-
-        // visual pulse
-        if (pingVisual == null)
-        {
-            pingVisual = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            pingVisual.transform.localScale = Vector3.one * 6f;
-            pingVisual.GetComponent<Renderer>().material = new Material(Shader.Find("EchoVoid/EchoPulse"));
-            pingVisual.GetComponent<Renderer>().material.color = pingColor;
-            pingVisual.name = "NeuralPingVisual";
-            Destroy(pingVisual.GetComponent<Collider>());
-        }
-
         StartCoroutine(PulseVisual());
     }
     private AudioClip GeneratePing()
@@ -258,18 +241,32 @@ public class ThemeSongGenerator : MonoBehaviour
         {
             pingVisual = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             pingVisual.name = "NeuralPingVisual";
-            Destroy(pingVisual.GetComponent<Collider>());
+            
+            // Remove collider to avoid physics interactions
+            var collider = pingVisual.GetComponent<Collider>();
+            if (collider != null)
+                Destroy(collider);
 
-            var mat = new Material(Shader.Find("Mobile/Particles/Additive"));
+            // Setup material with fallback shader
+            Shader shader = Shader.Find("Mobile/Particles/Additive");
+            if (shader == null)
+                shader = Shader.Find("Sprites/Default");
+            
+            var mat = new Material(shader);
             mat.color = new Color(pingColor.r, pingColor.g, pingColor.b, 0.2f);
-            pingVisual.GetComponent<Renderer>().material = mat;
-            pingVisual.GetComponent<Renderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            pingVisual.layer = LayerMask.NameToLayer("UI");
-            // ensure visible
+            
+            var renderer = pingVisual.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                renderer.material = mat;
+                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            }
         }
 
-        var player = FindObjectOfType<PlayerController>();
-        if (player == null) yield break;
+        if (cachedPlayer == null)
+            cachedPlayer = FindObjectOfType<PlayerController>();
+        
+        if (cachedPlayer == null) yield break;
 
         // Start at goal
         pingVisual.transform.position = goalTransform.position + Vector3.up * 0.05f;
@@ -277,7 +274,7 @@ public class ThemeSongGenerator : MonoBehaviour
         pingVisual.SetActive(true);
 
         // Distance from player to goal affects scale and fade
-        float dist = Vector3.Distance(goalTransform.position, player.transform.position);
+        float dist = Vector3.Distance(goalTransform.position, cachedPlayer.transform.position);
         float maxScale = Mathf.Clamp(dist, 3f, 20f);
         float maxAlpha = Mathf.Lerp(1f, 0.3f, Mathf.InverseLerp(0f, 25f, dist));
 

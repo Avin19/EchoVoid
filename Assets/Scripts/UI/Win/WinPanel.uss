@@ -21,7 +21,7 @@
 
 .win-title {
     color: #00ffff;
-    font-size: 26px;
+    font-size: 36px; /* Increased from 26px for mobile readability */
     unity-font-style: bold;
     text-shadow: 0 0 10px #00ffff;
     margin-bottom: 10px;
@@ -30,7 +30,7 @@
 
 .win-score {
     color: white;
-    font-size: 18px;
+    font-size: 28px; /* Increased from 18px for mobile readability */
     margin-bottom: 20px;
     text-shadow: 0 0 8px #00ffff;
 }

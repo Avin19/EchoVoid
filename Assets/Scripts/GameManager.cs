@@ -15,14 +15,18 @@ public class GameManager : MonoBehaviour
     [Header("References")]
     public EchoMapManager mapManager;
 
+
     [Header("Settings")]
     public float levelTransitionDelay = 1.5f;
 
     [Header("Prefabs")]
     public GameObject pulsePrefab;
 
+
+
     private int currentLevel = 1;
     private GameState currentState = GameState.Playing;
+    private PlayerController cachedPlayer;
 
     // ✅ Public properties
     public GameState CurrentState => currentState;
@@ -37,7 +41,7 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+
         }
         else
         {
@@ -47,7 +51,18 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+
         StartLevel();
+
+    }
+
+    private void OnDestroy()
+    {
+        // Clear singleton reference when destroyed
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 
     // 🔁 Start or regenerate a level
@@ -59,8 +74,12 @@ public class GameManager : MonoBehaviour
         // Reset gameplay visuals and map
         mapManager.GenerateMapAndSpawn();
 
+        // Cache player reference after spawn
+        cachedPlayer = FindObjectOfType<PlayerController>();
+
         // Reset UI
         UIManager.Instance?.ResetUIForNewLevel();
+
 
         // Resume time
         Time.timeScale = 1f;
@@ -116,6 +135,7 @@ public class GameManager : MonoBehaviour
         // Hide WinPanel if somehow active
         WinPanelManager.Instance?.HideWinPanel();
 
+
         // Show loss panel
         LossPanelManager.Instance?.ShowLossPanel();
     }
@@ -134,6 +154,7 @@ public class GameManager : MonoBehaviour
         LevelTransitionManager.Instance?.FadeToNextLevel(() =>
         {
             StartLevel();
+
             OnLevelRestartedEvent?.Invoke(); // Notify listeners (e.g., tutorial reset)
         });
     }
@@ -143,6 +164,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("🔁 Restarting Game from Level 1...");
         currentLevel = 1;
+
         StartLevel();
     }
 
@@ -156,8 +178,10 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f;
 
         // Refill energy + hide panels
-        var player = FindObjectOfType<PlayerController>();
-        player?.RestoreFullEnergy();
+        if (cachedPlayer == null)
+            cachedPlayer = FindObjectOfType<PlayerController>();
+
+        cachedPlayer?.RestoreFullEnergy();
 
         WinPanelManager.Instance?.HideWinPanel();
         LossPanelManager.Instance?.HideLossPanel();

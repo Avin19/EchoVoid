@@ -27,6 +27,22 @@ public class UIManager : MonoBehaviour
             return;
         }
         Instance = this;
+        
+        // Set proper sorting order for HUD
+        var uiDoc = GetComponent<UIDocument>();
+        if (uiDoc != null && UIPanelSortingManager.Instance != null)
+        {
+            UIPanelSortingManager.Instance.SetPanelSortOrder(uiDoc, PanelType.HUD);
+        }
+    }
+
+    void OnDestroy()
+    {
+        // Clear singleton reference when destroyed
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 
     void Start()
@@ -48,6 +64,8 @@ public class UIManager : MonoBehaviour
         CurrentLevel = level;
         if (levelLabel != null)
             levelLabel.text = $"LEVEL {level}";
+        else
+            Debug.LogWarning("UIManager: levelLabel is null. UI may not be initialized.");
     }
 
     // 💯 SCORE
@@ -56,6 +74,8 @@ public class UIManager : MonoBehaviour
         CurrentScore = newScore;
         if (scoreLabel != null)
             scoreLabel.text = CurrentScore.ToString("0000");
+        else
+            Debug.LogWarning("UIManager: scoreLabel is null. UI may not be initialized.");
     }
 
     public void AddScore(int amount) => UpdateScore(CurrentScore + amount);

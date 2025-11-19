@@ -9,6 +9,7 @@
     overflow: hidden;
     flex-direction: column;
     pointer-events: auto;
+    z-index: 100;
 }
 
 /* === RIPPLE BACKGROUND === */
@@ -61,7 +62,7 @@
 
 /* === TITLE === */
 .title {
-    font-size: 80px;
+    font-size: 64px; /* Reduced slightly but still prominent */
     color: #00ffff;
     unity-font-style: bold;
     letter-spacing: 4px;
@@ -102,14 +103,25 @@
     align-items: center;
     justify-content: center;
     box-shadow: 0 0 15px rgba(0,255,255,0.15);
+    /* ensure the box doesn't force an extremely long single line */
+    max-width: 100%;
+    overflow: visible;
 }
 
+/* Make text wrap nicely on small screens and support manual \n line breaks */
 .tutorial-text {
     color: #aaffff;
-    font-size: 20px;
+    font-size: 26px; /* Increased from 20px for mobile readability */
     text-align: center;
     margin: 10px;
     animation: neonPulse 3s infinite ease-in-out;
+
+    /* IMPORTANT: enable wrapping and sensible overflow */
+    white-space: normal;                      /* allow wrapping */
+    unity-text-overflow-position: end;        /* where ellipsis would appear if needed */
+    unity-text-align: upper-center;           /* keep it visually centered */
+    /* optional: limit long words causing overflow */
+    overflow-wrap: break-word;
 }
 
 /* === STEP CONTAINERS === */
@@ -134,7 +146,7 @@
 /* === STEP TEXT === */
 .step-title {
     color: #7ff;
-    font-size: 20px;
+    font-size: 28px; /* Increased from 20px for mobile readability */
     unity-font-style: bold;
     margin-bottom: 5px;
     animation: neonPulse 2.2s infinite ease-in-out;
@@ -142,7 +154,7 @@
 
 .step-desc {
     color: #ccffff;
-    font-size: 16px;
+    font-size: 22px; /* Increased from 16px for mobile readability */
     opacity: 0.9;
     text-shadow:
         0 0 6px #00ffff,
@@ -152,9 +164,9 @@
 /* === BUTTON === */
 .menu-button {
     margin-top: 20px;
-    width: 280px;
-    height: 50px;
-    font-size: 22px;
+    width: 300px; /* Slightly wider for better touch target */
+    height: 60px; /* Taller for better touch target */
+    font-size: 28px; /* Increased from 22px for mobile readability */
     color: #00ffff;
     border: 2px solid #00ffff;
     border-radius: 10px;
@@ -164,6 +176,8 @@
         0 0 16px #00cccc;
     box-shadow: 0 0 25px rgba(0,255,255,0.1);
     transition: all 0.25s ease-in-out;
+    z-index: 200;
+    pointer-events: auto;
 }
 
 .menu-button:hover {

@@ -12,6 +12,13 @@ public class EchoMapGenerator : MonoBehaviour
 
     public EchoMap Generate()
     {
+        if (width < 10 || height < 10)
+        {
+            Debug.LogError($"EchoMapGenerator: Map size too small ({width}x{height}). Minimum is 10x10.");
+            width = Mathf.Max(width, 10);
+            height = Mathf.Max(height, 10);
+        }
+
         EchoMap map = new EchoMap(width, height);
         Random.InitState(seed);
 

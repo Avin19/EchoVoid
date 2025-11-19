@@ -31,6 +31,18 @@ public class EchoMapManager : MonoBehaviour
     // 💡 Main entry point — can be reused for next levels
     public void GenerateMapAndSpawn()
     {
+        if (generator == null)
+        {
+            Debug.LogError("EchoMapManager: Generator is null! Cannot generate map.");
+            return;
+        }
+
+        if (rend == null)
+        {
+            Debug.LogError("EchoMapManager: Renderer is null! Cannot render map.");
+            return;
+        }
+
         // Clear previous map objects
         if (mapParent != null)
         {
@@ -76,6 +88,9 @@ public class EchoMapManager : MonoBehaviour
         Vector2Int goal = MapUtils.FindTile(currentMap, TileType.Goal);
         if (goal.x == -1) goal = new Vector2Int(currentMap.width - 3, currentMap.height - 3);
 
+        Vector3 spawnPos = Vector3.zero;
+        bool foundValidTile = false;
+
         for (int x = 1; x < currentMap.width - 1; x++)
         {
             for (int y = 1; y < currentMap.height - 1; y++)
@@ -85,39 +100,56 @@ public class EchoMapManager : MonoBehaviour
                 {
                     if (MapUtils.IsReachable(currentMap, tile, goal))
                     {
-                        Vector3 spawnWorld = MapUtils.TileToWorld(tile, tileSize);
-                        currentPlayer = Instantiate(playerPrefab, spawnWorld, Quaternion.identity, playerParent);
-
-                        // ✅ Assign camera target
-                        var cameraFollow = Camera.main.GetComponent<CameraFollow>();
-                        if (cameraFollow != null)
-                            cameraFollow.SetTarget(currentPlayer.transform);
-                        // ✅ Assign joystick reference
-
-                        var playerController1 = currentPlayer.GetComponent<PlayerController>();
-                        if (playerController1 != null)
-                        {
-                            playerController1.AssignJoystick(joystick);
-                        }
+                        spawnPos = MapUtils.TileToWorld(tile, tileSize);
+                        foundValidTile = true;
                         Debug.Log($"✅ Player spawned at tile {tile}");
-                        return;
+                        break;
                     }
                 }
             }
+            if (foundValidTile) break;
         }
 
-        // fallback center spawn
-        Vector3 fallbackPos = new Vector3(currentMap.width / 2, currentMap.height / 2, 0);
-        currentPlayer = Instantiate(playerPrefab, fallbackPos, Quaternion.identity, playerParent);
-        var cam = Camera.main.GetComponent<CameraFollow>();
-        if (cam != null)
-            cam.SetTarget(currentPlayer.transform);
-        var playerController = currentPlayer.GetComponent<PlayerController>();
-        if (playerController != null)
+        // Fallback center spawn if no valid tile found
+        if (!foundValidTile)
+        {
+            spawnPos = new Vector3(currentMap.width / 2, currentMap.height / 2, 0);
+            Debug.Log("⚠️ Player spawned at fallback center");
+        }
+
+        // Instantiate player
+        currentPlayer = Instantiate(playerPrefab, spawnPos, Quaternion.identity, playerParent);
+        
+        // Setup player references (consolidated)
+        SetupPlayerReferences(currentPlayer);
+    }
+
+    // 🔧 Helper method to setup player references (eliminates duplication)
+    void SetupPlayerReferences(GameObject player)
+    {
+        if (player == null) return;
+
+        // Assign camera target
+        var cameraFollow = Camera.main?.GetComponent<CameraFollow>();
+        if (cameraFollow != null)
+            cameraFollow.SetTarget(player.transform);
+
+        // Assign joystick reference
+        var playerController = player.GetComponent<PlayerController>();
+        if (playerController != null && joystick != null)
         {
             playerController.AssignJoystick(joystick);
         }
-        Debug.Log("⚠️ Player spawned at fallback center");
+
+        // Add goal direction arrow
+        var directionArrow = player.GetComponent<GoalDirectionArrow>();
+        if (directionArrow == null)
+        {
+            directionArrow = player.AddComponent<GoalDirectionArrow>();
+        }
+        directionArrow.SetPlayer(player.transform);
+        
+        // Goal will be set after it's spawned
     }
 
     // 🌟 Spawns goal on an empty tile
@@ -155,7 +187,13 @@ public class EchoMapManager : MonoBehaviour
             {
                 goalCtrl.AssignPlayer(currentPlayer.transform);
                 ThemeSongGenerator.Instance?.SetGoal(goalCtrl.transform);
+            }
 
+            // Set goal reference for direction arrow
+            var directionArrow = currentPlayer.GetComponent<GoalDirectionArrow>();
+            if (directionArrow != null)
+            {
+                directionArrow.SetGoal(goal.transform);
             }
         }
 

@@ -13,22 +13,40 @@ public class EchoPostFx : MonoBehaviour
 
     void Start()
     {
+        if (volume == null || volume.profile == null)
+        {
+            Debug.LogError("EchoPostFx: Volume or profile is null. Post-processing effects disabled.");
+            return;
+        }
+
         volume.profile.TryGet(out bloom);
         volume.profile.TryGet(out vignette);
         volume.profile.TryGet(out chroma);
+
+        if (bloom == null)
+            Debug.LogWarning("EchoPostFx: Bloom effect not found in volume profile.");
+        if (chroma == null)
+            Debug.LogWarning("EchoPostFx: Chromatic Aberration effect not found in volume profile.");
     }
 
     public void PulseFX()
     {
-        StartCoroutine(AnimatePulse());
+        if (bloom != null || chroma != null)
+            StartCoroutine(AnimatePulse());
     }
 
     IEnumerator AnimatePulse()
     {
-        bloom.intensity.value = 3f;
-        chroma.intensity.value = 0.4f;
+        if (bloom != null)
+            bloom.intensity.value = 3f;
+        if (chroma != null)
+            chroma.intensity.value = 0.4f;
+        
         yield return new WaitForSeconds(0.3f);
-        bloom.intensity.value = 2f;
-        chroma.intensity.value = 0.15f;
+        
+        if (bloom != null)
+            bloom.intensity.value = 2f;
+        if (chroma != null)
+            chroma.intensity.value = 0.15f;
     }
 }

@@ -16,13 +16,22 @@ public class PlayerController : MonoBehaviour
     public SoundPulse pulsePrefab;
     public float pulseCooldown = 0.5f;
     private float nextPulseTime;
+    
+    [Header("Input Buffering")]
+    public float inputBufferTime = 0.2f;
+    private float pulseBufferTimer = -1f;
 
     [Header("References")]
     private Joystick joystick;
 
+    [Header("Debug")]
+    public bool showDebugInfo = false;
+
     public void AssignJoystick(Joystick joy)
     {
         joystick = joy;
+        if (showDebugInfo)
+            Debug.Log($"✅ Joystick assigned to player: {joy != null}");
     }
 
     void Start()
@@ -37,21 +46,47 @@ public class PlayerController : MonoBehaviour
         if (!GameManager.Instance.IsPlaying())
             return;
 
-#if UNITY_ANDROID || UNITY_IOS
-        // ✅ Use joystick on mobile
-        input = joystick != null ? joystick.Direction : Vector2.zero;
-#else
-        // ✅ Use keyboard on PC
-        input.x = Input.GetAxisRaw("Horizontal");
-        input.y = Input.GetAxisRaw("Vertical");
-#endif
+        // ✅ Support both joystick and keyboard input simultaneously
+        Vector2 joystickInput = Vector2.zero;
+        Vector2 keyboardInput = Vector2.zero;
 
-        // Debug joystick values
+        // Get joystick input (works in editor and on mobile)
+        if (joystick != null)
+        {
+            joystickInput = joystick.Direction;
+        }
 
-        // ✅ Emit pulse
+        // Get keyboard input (WASD/Arrow keys)
+        keyboardInput.x = Input.GetAxisRaw("Horizontal");
+        keyboardInput.y = Input.GetAxisRaw("Vertical");
+
+        // Use whichever input is stronger (allows testing with both)
+        if (joystickInput.sqrMagnitude > keyboardInput.sqrMagnitude)
+        {
+            input = joystickInput;
+        }
+        else
+        {
+            input = keyboardInput;
+        }
+
+        // ✅ Input buffering for pulse
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            TryEmitPulse();
+            pulseBufferTimer = inputBufferTime;
+        }
+
+        // Try to consume buffered input
+        if (pulseBufferTimer > 0)
+        {
+            if (TryEmitPulse())
+            {
+                pulseBufferTimer = -1f; // Clear buffer on success
+            }
+            else
+            {
+                pulseBufferTimer -= Time.deltaTime; // Decay buffer timer
+            }
         }
     }
 
@@ -60,12 +95,19 @@ public class PlayerController : MonoBehaviour
         if (!GameManager.Instance.IsPlaying())
             return;
 
-        rb.MovePosition(rb.position + input * moveSpeed * Time.fixedDeltaTime);
+        Vector2 movement = input * moveSpeed * Time.fixedDeltaTime;
+        rb.MovePosition(rb.position + movement);
+
+        // Debug logging
+        if (showDebugInfo && input.sqrMagnitude > 0.01f)
+        {
+            Debug.Log($"🎮 Input: {input} | Movement: {movement} | Position: {rb.position}");
+        }
     }
 
-    public void TryEmitPulse()
+    public bool TryEmitPulse()
     {
-        if (Time.time < nextPulseTime) return;
+        if (Time.time < nextPulseTime) return false;
 
         if (currentEnergy > 0)
         {
@@ -79,10 +121,13 @@ public class PlayerController : MonoBehaviour
 
             if (currentEnergy <= 0)
                 GameManager.Instance?.OnPlayerEnergyDepleted();
+            
+            return true; // Pulse emitted successfully
         }
         else
         {
             Debug.Log("⚠️ Out of energy!");
+            return false; // Failed to emit pulse
         }
     }
 

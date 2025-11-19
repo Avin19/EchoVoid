@@ -30,7 +30,7 @@
 
 /* === LEVEL === */
 .level-label {
-    font-size: 28px;
+    font-size: 36px; /* Increased from 28px for mobile readability */
     color: #00ffff;
     unity-font-style: bold;
     margin: 10px 0 20px 10px;
@@ -47,13 +47,13 @@
 }
 
 .hud-label {
-    font-size: 20px;
+    font-size: 26px; /* Increased from 20px for mobile readability */
     color: rgba(0,255,255,0.7);
     text-shadow: 0 0 8px #00ffff;
 }
 
 .hud-value {
-    font-size: 24px;
+    font-size: 32px; /* Increased from 24px for mobile readability */
     color: #00ffff;
     unity-font-style: bold;
     text-shadow:

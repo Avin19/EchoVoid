@@ -9,7 +9,26 @@ public class LossPanelManager : MonoBehaviour
     private Button watchAdButton;
     private Button restartButton;
 
-    void Awake() => Instance = this;
+    void Awake()
+    {
+        Instance = this;
+
+        // Set proper sorting order for modal panel
+        var uiDoc = GetComponent<UIDocument>();
+        if (uiDoc != null && UIPanelSortingManager.Instance != null)
+        {
+            UIPanelSortingManager.Instance.SetPanelSortOrder(uiDoc, PanelType.Modal);
+        }
+    }
+
+    void OnDestroy()
+    {
+        // Clear singleton reference when destroyed
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
 
     void Start()
     {
@@ -21,6 +40,7 @@ public class LossPanelManager : MonoBehaviour
 
         watchAdButton.clicked += OnWatchAdClicked;
         restartButton.clicked += OnRestartClicked;
+
     }
 
     public void ShowLossPanel()
@@ -37,7 +57,7 @@ public class LossPanelManager : MonoBehaviour
 
     private void OnWatchAdClicked()
     {
-        Debug.Log("🎬 Watch Ad to Continue clicked");
+
         HideLossPanel();
     }
 

@@ -34,6 +34,12 @@ public class TutorialUI : MonoBehaviour
     void Awake()
     {
         uiDocument = GetComponent<UIDocument>();
+        
+        // Set proper sorting order for tutorial panel
+        if (UIPanelSortingManager.Instance != null)
+        {
+            UIPanelSortingManager.Instance.SetPanelSortOrder(uiDocument, PanelType.Tutorial);
+        }
     }
 
     void Start()
@@ -49,8 +55,18 @@ public class TutorialUI : MonoBehaviour
         stepMove = root.Q<VisualElement>("step-move");
         stepPulse = root.Q<VisualElement>("step-pulse");
         stepDone = root.Q<VisualElement>("step-done");
+        skipButton = root.Q<Button>("skip-button");
 
-
+        // Hook up skip button
+        if (skipButton != null)
+        {
+            skipButton.clicked += SkipTutorial;
+            Debug.Log("[TutorialUI] Skip button hooked up successfully.");
+        }
+        else
+        {
+            Debug.LogWarning("[TutorialUI] Skip button not found in UI!");
+        }
 
         // Ensure player/joystick references if not assigned
         if (joystick == null)

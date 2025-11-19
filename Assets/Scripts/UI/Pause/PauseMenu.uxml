@@ -3,10 +3,17 @@
     <ui:VisualElement name="pause-root" class="pause-root">
         <ui:Button name="pause-button" text="⏸" class="pause-btn" />
         <ui:VisualElement name="pause-panel" class="pause-panel" style="display: none;">
-            <ui:Label text="PAUSED" class="pause-title" />
-            <ui:Button name="resume-button" text="RESUME" class="pause-option" />
-            <ui:Button name="mainmenu-button" text="MAIN MENU" class="pause-option" />
-            <ui:Button name="exit-button" text="EXIT" class="pause-option" />
+            <ui:VisualElement class="pause-overlay" />
+            <ui:VisualElement class="pause-content">
+                <ui:Label text="PAUSED" class="pause-title" />
+                <ui:Label text="Press ESC or tap Resume to continue" class="pause-subtitle" />
+                <ui:VisualElement class="pause-buttons">
+                    <ui:Button name="resume-button" text="▶ RESUME" class="pause-option pause-primary" />
+                    <ui:Button name="restart-button" text="🔄 RESTART LEVEL" class="pause-option" />
+                    <ui:Button name="mainmenu-button" text="🏠 MAIN MENU" class="pause-option" />
+                    <ui:Button name="exit-button" text="🚪 EXIT GAME" class="pause-option pause-danger" />
+                </ui:VisualElement>
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

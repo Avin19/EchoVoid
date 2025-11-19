@@ -10,7 +10,26 @@ public class WinPanelManager : MonoBehaviour
     private Button nextLevelButton;
     private Button rewardButton;
 
-    void Awake() => Instance = this;
+    void Awake()
+    {
+        Instance = this;
+
+        // Set proper sorting order for modal panel
+        var uiDoc = GetComponent<UIDocument>();
+        if (uiDoc != null && UIPanelSortingManager.Instance != null)
+        {
+            UIPanelSortingManager.Instance.SetPanelSortOrder(uiDoc, PanelType.Modal);
+        }
+    }
+
+    void OnDestroy()
+    {
+        // Clear singleton reference when destroyed
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
 
     void Start()
     {
@@ -24,6 +43,7 @@ public class WinPanelManager : MonoBehaviour
 
         nextLevelButton.clicked += OnNextLevelClicked;
         rewardButton.clicked += OnRewardClicked;
+
     }
 
     public void ShowWinPanel(int score)
@@ -47,7 +67,8 @@ public class WinPanelManager : MonoBehaviour
 
     private void OnRewardClicked()
     {
+
         HideWinPanel();
-        //AdsManager.Instance?.ShowRewarded();
+
     }
 }

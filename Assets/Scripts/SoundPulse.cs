@@ -28,14 +28,27 @@ public class SoundPulse : MonoBehaviour
         // Play sound
         if (pulseAudioSource) pulseAudioSource.Play();
 
-        // Spawn visual ring
+        // Spawn visual ring (use pooling if available, otherwise instantiate)
         GameObject ring = null;
         Material ringMat = null;
 
         if (pulseVisualPrefab)
         {
-            ring = Instantiate(pulseVisualPrefab, transform.position, Quaternion.identity);
-            ringMat = ring.GetComponent<SpriteRenderer>().material;
+            if (ObjectPool.Instance != null)
+            {
+                ring = ObjectPool.Instance.SpawnFromPool("PulseRing", transform.position, Quaternion.identity);
+            }
+            else
+            {
+                ring = Instantiate(pulseVisualPrefab, transform.position, Quaternion.identity);
+            }
+            
+            if (ring != null)
+            {
+                var spriteRenderer = ring.GetComponent<SpriteRenderer>();
+                if (spriteRenderer != null)
+                    ringMat = spriteRenderer.material;
+            }
         }
 
         while (radius < maxRadius)
@@ -66,8 +79,14 @@ public class SoundPulse : MonoBehaviour
             yield return null;
         }
 
+        // Return to pool or destroy
         if (ring)
-            Destroy(ring);
+        {
+            if (ObjectPool.Instance != null)
+                ObjectPool.Instance.ReturnToPool(ring);
+            else
+                Destroy(ring);
+        }
 
         isPulsing = false;
     }

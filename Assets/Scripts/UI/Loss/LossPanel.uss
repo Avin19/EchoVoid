@@ -21,7 +21,7 @@
 
 .loss-title {
     color: #00ffff;
-    font-size: 24px;
+    font-size: 34px; /* Increased from 24px for mobile readability */
     unity-font-style: bold;
     text-shadow: 0 0 10px #00ffff;
     margin-bottom: 10px;
@@ -30,7 +30,7 @@
 
 .loss-subtext {
     color: white;
-    font-size: 14px;
+    font-size: 24px; /* Increased from 14px for mobile readability */
     text-align: center;
     margin-bottom: 20px;
 }
