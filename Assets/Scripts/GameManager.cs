@@ -51,6 +51,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        // AdManager.Instance.ShowBanner(); ;
 
         StartLevel();
 
@@ -164,14 +165,14 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("🔁 Restarting Game from Level 1...");
         currentLevel = 1;
-
+        // AdManager.Instance.ShowInterstitial();
         StartLevel();
     }
 
     // 🎁 Continue after rewarded ad
     public void ContinueAfterAd()
     {
-        Debug.Log("🎁 Continue after ad watched!");
+        // AdManager.Instance.ShowRewarded();
 
         // Reset state
         SetState(GameState.Playing);

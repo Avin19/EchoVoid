@@ -1,19 +1,9 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 
-/// <summary>
-/// Interactive tutorial for joystick + pulse.
-/// - Step 1: requires joystick movement (or keyboard) for a short sustained threshold.
-/// - Step 2: requires a pulse (space key or pulse button).
-/// - After completion, hides itself and optionally notifies GameManager or other listeners.
-/// 
-/// Setup:
-/// - Put a UIDocument in your scene and assign the TutorialUI.uxml as the source asset.
-/// - Attach this script to the same GameObject as the UIDocument (or assign UIDocument manually).
-/// - Assign 'joystick' (your Joystick component) and 'player' (PlayerController) via inspector if you have them.
-/// </summary>
-[RequireComponent(typeof(UIDocument))]
+
+
 public class TutorialUI : MonoBehaviour
 {
     public Joystick joystick; // assign in inspector (optional)
@@ -21,46 +11,25 @@ public class TutorialUI : MonoBehaviour
     public float moveThreshold = 0.4f; // joystick magnitude required
     public float sustainSeconds = 0.35f; // how long movement must be sustained
 
-    UIDocument uiDocument;
-    VisualElement root;
-    VisualElement stepMove;
-    VisualElement stepPulse;
-    VisualElement stepDone;
-    Button skipButton;
+
+    [SerializeField] private Button skipButton;
 
     bool stepMoveCompleted = false;
     bool stepPulseCompleted = false;
 
     void Awake()
     {
-        uiDocument = GetComponent<UIDocument>();
-        
-        // Set proper sorting order for tutorial panel
-        if (UIPanelSortingManager.Instance != null)
-        {
-            UIPanelSortingManager.Instance.SetPanelSortOrder(uiDocument, PanelType.Tutorial);
-        }
+
     }
 
     void Start()
     {
-        if (uiDocument == null)
-        {
-            Debug.LogError("[TutorialUI] No UIDocument found on same GameObject.");
-            enabled = false;
-            return;
-        }
 
-        root = uiDocument.rootVisualElement.Q<VisualElement>("tutorial-root");
-        stepMove = root.Q<VisualElement>("step-move");
-        stepPulse = root.Q<VisualElement>("step-pulse");
-        stepDone = root.Q<VisualElement>("step-done");
-        skipButton = root.Q<Button>("skip-button");
 
         // Hook up skip button
         if (skipButton != null)
         {
-            skipButton.clicked += SkipTutorial;
+            skipButton.onClick.AddListener(SkipTutorial);
             Debug.Log("[TutorialUI] Skip button hooked up successfully.");
         }
         else
@@ -118,12 +87,7 @@ public class TutorialUI : MonoBehaviour
 
     void OnMoveStepCompleted()
     {
-        // show pulse step, hide move step
-        if (stepMove != null) stepMove.style.display = DisplayStyle.None;
-        if (stepPulse != null) stepPulse.style.display = DisplayStyle.Flex;
 
-        // Listen for pulse action
-        // If you have a pulse button in UI, we could query it; instead we listen for SPACE or call TryEmitPulse.
         Invoke(nameof(StepPulseSucceeded), 2f);
     }
 
@@ -132,10 +96,7 @@ public class TutorialUI : MonoBehaviour
     void StepPulseSucceeded()
     {
         stepPulseCompleted = true;
-        if (stepPulse != null) stepPulse.style.display = DisplayStyle.None;
-        if (stepDone != null) stepDone.style.display = DisplayStyle.Flex;
 
-        // short delay then hide
         StartCoroutine(FinishAndHide(0.9f));
     }
 
@@ -152,8 +113,6 @@ public class TutorialUI : MonoBehaviour
 
     void HideTutorial()
     {
-        if (root != null)
-            root.style.display = DisplayStyle.None;
 
         // Optionally notify GameManager or other systems (if needed)
         // Example: GameManager.Instance?.OnTutorialCompleted();

@@ -1,24 +1,23 @@
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class MainMenuController : MonoBehaviour
 {
-    private Button startButton;
-    private Button settingsButton;
-    private Button exitButton;
+    [SerializeField] private Button startButton;
+    [SerializeField] private Button settingsButton;
+    [SerializeField] private Button exitButton;
 
     void OnEnable()
     {
-        var root = GetComponent<UIDocument>().rootVisualElement;
 
-        startButton = root.Q<Button>("start-button");
-        settingsButton = root.Q<Button>("settings-button");
-        exitButton = root.Q<Button>("exit-button");
-
-        startButton.clicked += OnStartClicked;
-        settingsButton.clicked += OnSettingsClicked;
-        exitButton.clicked += OnExitClicked;
+        startButton.onClick.AddListener(OnStartClicked);
+        settingsButton.onClick.AddListener(OnSettingsClicked);
+        exitButton.onClick.AddListener(OnExitClicked);
+    }
+    void Start()
+    {
+        AdManager.Instance.ShowBanner();
     }
 
     void OnStartClicked()
@@ -34,6 +33,12 @@ public class MainMenuController : MonoBehaviour
         // TODO: open settings UI or overlay
     }
 
+    private void Osable()
+    {
+        startButton.onClick.RemoveListener(OnStartClicked);
+        settingsButton.onClick.RemoveListener(OnSettingsClicked);
+        exitButton.onClick.RemoveListener(OnExitClicked);
+    }
     void OnExitClicked()
     {
 #if UNITY_EDITOR
