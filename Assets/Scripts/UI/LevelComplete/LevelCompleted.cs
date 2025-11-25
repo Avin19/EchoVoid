@@ -45,8 +45,20 @@ public class LevelCompleted : MonoBehaviour
 
     private void RestartButton()
     {
-        GameManager.Instance.RestartGame();
-        Debug.Log("Restarting the game ");
+        if (restartBtnText.text == " NEXT LEVEL ")
+        {
+            GameManager.Instance.NextLevel();
+        }
+        else if (restartBtnText.text == " RESTART LEVEL ")
+        {
+            GameManager.Instance.RestartLevel();
+        }
+        else if (restartBtnText.text == " RESUME ")
+        {
+            GameManager.Instance.RestartGame();
+        }
+
+
     }
     void OnDisable()
     {

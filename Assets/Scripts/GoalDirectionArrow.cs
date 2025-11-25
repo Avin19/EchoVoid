@@ -12,11 +12,11 @@ public class GoalDirectionArrow : MonoBehaviour
 
     [Header("Arrow Settings")]
     public float distanceFromPlayer = 1.5f;
-    public float arrowScale = 0.5f;
+    public float arrowScale = 2f;
     public Color arrowColor = new Color(1f, 0.3f, 0.3f, 0.8f); // Red with transparency
-    
+
     [Header("Visibility Settings")]
-    public bool showOnlyWhenFar = true;
+    public bool showOnlyWhenFar = false;
     public float minDistanceToShow = 5f; // Only show when goal is far
     public float maxDistanceToShow = 50f; // Hide when too far (out of range)
 
@@ -60,7 +60,7 @@ public class GoalDirectionArrow : MonoBehaviour
             {
                 UpdateArrowPosition();
                 UpdateArrowRotation();
-                
+
                 if (enablePulse)
                 {
                     AnimatePulse();
@@ -73,9 +73,11 @@ public class GoalDirectionArrow : MonoBehaviour
     {
         arrowObject = new GameObject("GoalDirectionArrow");
         arrowObject.transform.SetParent(transform);
+        arrowObject.transform.localScale = Vector3.one * 2;
 
         arrowRenderer = arrowObject.AddComponent<SpriteRenderer>();
         arrowRenderer.sprite = CreateArrowSprite();
+        arrowRenderer.material = new Material(Shader.Find("EchoVoid/PlayerGlow"));
         arrowRenderer.color = arrowColor;
         arrowRenderer.sortingOrder = 100; // Render on top
 
@@ -129,7 +131,7 @@ public class GoalDirectionArrow : MonoBehaviour
 
         // Draw arrow shape (pointing up)
         int centerX = size / 2;
-        
+
         // Arrow head (triangle)
         for (int y = size - 8; y < size; y++)
         {

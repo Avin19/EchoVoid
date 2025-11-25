@@ -99,7 +99,6 @@ public class GameManager : MonoBehaviour
         SetState(GameState.Won);
         score += 100;
 
-        Debug.Log($"🎉 Level {currentLevel} complete!");
         Time.timeScale = 0f;
 
         gameUIManager.HUD(currentLevel);
@@ -115,10 +114,9 @@ public class GameManager : MonoBehaviour
     {
         if (currentState == GameState.Transitioning) return;
         SetState(GameState.Transitioning);
+        Debug.Log("Next Level Loading...");
         Time.timeScale = 1f;
-
         currentLevel++;
-        Debug.Log($"🚀 Loading Level {currentLevel}...");
         gameUIManager.HUD(currentLevel);
         StartLevel();
 
@@ -130,7 +128,7 @@ public class GameManager : MonoBehaviour
         if (currentState != GameState.Playing) return; // ✅ Prevent overlap
         SetState(GameState.Lost);
 
-        Debug.Log("💀 Player ran out of energy!");
+
         Time.timeScale = 0f;
 
         gameUIManager.ShowLossPanel("Player ran out of energy!");
@@ -146,15 +144,12 @@ public class GameManager : MonoBehaviour
         Debug.Log("🔄 Restarting current level...");
         AdManager.Instance.ShowInterstitial();
         StartLevel();
-
-
-
     }
 
     // 🧱 Restart entire game
     public void RestartGame()
     {
-        Debug.Log("🔁 Restarting Game from Level 1...");
+        Debug.Log($"🔁 Restarting Game from Level {currentLevel}...");
         AdManager.Instance.ShowInterstitial();
         gameUIManager.TransitionPanel();
 
