@@ -1,57 +1,43 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UIElements;
+
 
 public class GameUIManager : MonoBehaviour
 {
-    public static GameUIManager Instance;
-    private VisualElement root;
 
-    private VisualElement hudRoot, pausePanel, winRoot, tutorialRoot, energyFill;
-    private Button pauseButton, resumeButton, mainMenuButton, exitButton, nextLevelButton, rewardButton;
-    private Label levelLabel, scoreLabel, winScoreLabel, tutorialText, hintLabel;
-
+    [Header("Panel")]
+    [SerializeField]
+    private GameObject tutorial, transtional, hud, levelCompleted;
     private bool isPaused = false;
 
-    void Awake() => Instance = this;
+
 
     void Start()
     {
-        var uiDoc = GetComponent<UIDocument>();
-        root = uiDoc.rootVisualElement;
+        SetAllPanel();
+        tutorial.SetActive(true);
 
-        // Query all panels
-        hudRoot = root.Q<VisualElement>("hud-root");
-        pausePanel = root.Q<VisualElement>("pause-panel");
-        winRoot = root.Q<VisualElement>("win-root");
-        tutorialRoot = root.Q<VisualElement>("tutorial-root");
+    }
+    public void Restart()
+    {
+        TransitionPanel();
+    }
+    public void StartLevel()
+    {
+        Start();
+    }
 
-        // HUD
-        levelLabel = root.Q<Label>("level-label");
-        scoreLabel = root.Q<Label>("score-label");
-        energyFill = root.Q<VisualElement>("energy-bar-fill");
-
-        // Pause
-        pauseButton = root.Q<Button>("pause-button");
-        resumeButton = root.Q<Button>("resume-button");
-        mainMenuButton = root.Q<Button>("mainmenu-button");
-        exitButton = root.Q<Button>("exit-button");
-
-        // Win
-        winScoreLabel = root.Q<Label>("win-score");
-        nextLevelButton = root.Q<Button>("next-level-button");
-        rewardButton = root.Q<Button>("reward-button");
-
-        // Tutorial
-        tutorialText = root.Q<Label>("tutorial-text");
-        hintLabel = root.Q<Label>("hint-label");
-
-        // Setup events
-        pauseButton.clicked += PauseGame;
-        resumeButton.clicked += ResumeGame;
-        mainMenuButton.clicked += () => SceneManager.LoadScene(0);
-        exitButton.clicked += Application.Quit;
-        nextLevelButton.clicked += () => GameManager.Instance?.NextLevel();
+    public void SetAllPanel()
+    {
+        tutorial.SetActive(false);
+        transtional.SetActive(false);
+        hud.SetActive(false);
+        levelCompleted.SetActive(false);
+    }
+    public void TransitionPanel()
+    {
+        SetAllPanel();
+        transtional.SetActive(true);
+        Invoke(nameof(GameStart), 2f);
 
     }
 
@@ -59,32 +45,47 @@ public class GameUIManager : MonoBehaviour
     {
         isPaused = true;
         Time.timeScale = 0f;
-        pausePanel.style.display = DisplayStyle.Flex;
-        pauseButton.style.display = DisplayStyle.None;
+        SetAllPanel();
+        levelCompleted.SetActive(true);
+        levelCompleted.GetComponent<LevelCompleted>().Setup("PAUSE", "RESUME", "WATCH AD ");
     }
 
     public void ResumeGame()
     {
         isPaused = false;
         Time.timeScale = 1f;
-        pausePanel.style.display = DisplayStyle.None;
-        pauseButton.style.display = DisplayStyle.Flex;
+        SetAllPanel();
+        hud.SetActive(true);
+
+    }
+    public void HUD(int level)
+    {
+        hud.GetComponent<HUD>().UpdateLevel(level);
+    }
+    public void HudScore(int score)
+    {
+        hud.GetComponent<HUD>().UpdateScore(score);
     }
 
     public void ShowWinPanel(int score)
     {
-        winScoreLabel.text = $"SCORE: {score:0000}";
-        winRoot.style.display = DisplayStyle.Flex;
+        SetAllPanel();
+        levelCompleted.SetActive(true);
+        levelCompleted.GetComponent<LevelCompleted>().Setup("Level Completed", score, " NEXT Level", "EXTRA LIFE");
+    }
+    public void ShowLossPanel(string _message)
+    {
+        SetAllPanel();
+        levelCompleted.SetActive(true);
+        levelCompleted.GetComponent<LevelCompleted>().Setup(_message, "RESTART LEVEL", "WATCH AD");
+    }
+    public void GameStart()
+    {
+        SetAllPanel();
+        hud.SetActive(true);
+        isPaused = false;
+        Time.timeScale = 1f;
     }
 
-    public void ShowTutorial(string text)
-    {
-        tutorialText.text = text;
-        tutorialRoot.style.display = DisplayStyle.Flex;
-    }
 
-    public void HideTutorial()
-    {
-        tutorialRoot.style.display = DisplayStyle.None;
-    }
 }

@@ -49,7 +49,7 @@ public class AdManager : MonoBehaviour, IUnityAdsInitializationListener, IUnityA
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+
 
         // Choose platform-specific IDs
 #if UNITY_IOS
@@ -323,7 +323,7 @@ public class AdManager : MonoBehaviour, IUnityAdsInitializationListener, IUnityA
     private void GrantReward()
     {
         // TODO: Implement the actual reward logic for your game, e.g. give coins/lives.
-        Debug.Log("AdManager: Granting reward to user (placeholder).");
+        GameManager.Instance.GrantReward();
     }
     #endregion
 

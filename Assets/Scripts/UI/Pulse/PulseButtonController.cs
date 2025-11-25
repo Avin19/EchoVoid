@@ -1,22 +1,14 @@
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 
 public class PulseButtonController : MonoBehaviour
 {
-    private Button pulseButton;
+    [SerializeField] private Button pulseButton;
 
     void Awake()
     {
-        var root = GetComponent<UIDocument>().rootVisualElement;
-        pulseButton = root.Q<Button>("pulse-button");
 
-        if (pulseButton == null)
-        {
-            Debug.LogError("❌ Pulse button not found in UXML!");
-            return;
-        }
-
-        pulseButton.clicked += OnPulseClicked;
+        pulseButton.onClick.AddListener(OnPulseClicked);
     }
 
     void OnPulseClicked()
@@ -26,9 +18,6 @@ public class PulseButtonController : MonoBehaviour
         {
             player.TryEmitPulse();
         }
-        else
-        {
-            Debug.LogWarning("⚠️ Player not found!");
-        }
+
     }
 }

@@ -27,13 +27,13 @@ public class UIManager : MonoBehaviour
             return;
         }
         Instance = this;
-        
+
         // Set proper sorting order for HUD
         var uiDoc = GetComponent<UIDocument>();
-        if (uiDoc != null && UIPanelSortingManager.Instance != null)
-        {
-            UIPanelSortingManager.Instance.SetPanelSortOrder(uiDoc, PanelType.HUD);
-        }
+        // if (uiDoc != null && UIPanelSortingManager.Instance != null)
+        // {
+        //     UIPanelSortingManager.Instance.SetPanelSortOrder(uiDoc, PanelType.HUD);
+        // }
     }
 
     void OnDestroy()

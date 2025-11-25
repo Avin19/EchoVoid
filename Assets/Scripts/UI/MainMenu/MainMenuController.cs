@@ -6,15 +6,22 @@ public class MainMenuController : MonoBehaviour
 {
     [SerializeField] private Button startButton;
     [SerializeField] private Button settingsButton;
-    [SerializeField] private Button exitButton;
+    [SerializeField] private Button exitButton, settingBackBtn;
+    [SerializeField] private GameObject settingPanel;
 
     void OnEnable()
     {
-
         startButton.onClick.AddListener(OnStartClicked);
         settingsButton.onClick.AddListener(OnSettingsClicked);
         exitButton.onClick.AddListener(OnExitClicked);
+        settingBackBtn.onClick.AddListener(OnSettingBackClicked);
     }
+
+    private void OnSettingBackClicked()
+    {
+        settingPanel.SetActive(false);
+    }
+
     void Start()
     {
         AdManager.Instance.ShowBanner();
@@ -22,22 +29,23 @@ public class MainMenuController : MonoBehaviour
 
     void OnStartClicked()
     {
-        Debug.Log("Start clicked");
+
         SceneManager.LoadScene("GameScene"); // Change to your actual scene name
     }
 
     void OnSettingsClicked()
     {
-        Debug.Log("Settings clicked");
-        SceneManager.LoadScene("SettingsMenu");
+
+        settingPanel.SetActive(true);
         // TODO: open settings UI or overlay
     }
 
-    private void Osable()
+    private void OnDisable()
     {
         startButton.onClick.RemoveListener(OnStartClicked);
         settingsButton.onClick.RemoveListener(OnSettingsClicked);
         exitButton.onClick.RemoveListener(OnExitClicked);
+        settingBackBtn.onClick.RemoveListener(OnSettingBackClicked);
     }
     void OnExitClicked()
     {

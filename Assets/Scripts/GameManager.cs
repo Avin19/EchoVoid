@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
 
 
     [Header("Settings")]
-    public float levelTransitionDelay = 1.5f;
+
 
     [Header("Prefabs")]
     public GameObject pulsePrefab;
@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour
 
 
     private int currentLevel = 1;
+    private int score = 0;
     private GameState currentState = GameState.Playing;
     private PlayerController cachedPlayer;
 
@@ -35,6 +36,8 @@ public class GameManager : MonoBehaviour
     // 🔔 Optional: event for other systems (TutorialManager, Audio, etc.)
     public event System.Action OnGoalReachedEvent;
     public event System.Action OnLevelRestartedEvent;
+
+    [SerializeField] private GameUIManager gameUIManager;
 
     private void Awake()
     {
@@ -51,7 +54,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        // AdManager.Instance.ShowBanner(); ;
+        //AdManager.Instance.ShowBanner(); ;
 
         StartLevel();
 
@@ -79,29 +82,29 @@ public class GameManager : MonoBehaviour
         cachedPlayer = FindObjectOfType<PlayerController>();
 
         // Reset UI
-        UIManager.Instance?.ResetUIForNewLevel();
-
+        gameUIManager.StartLevel();
 
         // Resume time
         Time.timeScale = 1f;
     }
 
+    public void Transition()
+    {
+        gameUIManager.TransitionPanel();
+    }
     // 🎯 When player reaches goal
     public void OnGoalReached()
     {
         if (currentState != GameState.Playing) return; // ✅ Prevent overlap
         SetState(GameState.Won);
+        score += 100;
 
         Debug.Log($"🎉 Level {currentLevel} complete!");
         Time.timeScale = 0f;
 
-        int score = UIManager.Instance != null ? UIManager.Instance.CurrentScore : 0;
-
-        // Hide any active loss UI (safety)
-        LossPanelManager.Instance?.HideLossPanel();
-
-        // Show win panel
-        WinPanelManager.Instance?.ShowWinPanel(score);
+        gameUIManager.HUD(currentLevel);
+        gameUIManager.HudScore(score);
+        gameUIManager.ShowWinPanel(score);
 
         // 🔔 Notify any listeners
         OnGoalReachedEvent?.Invoke();
@@ -116,12 +119,9 @@ public class GameManager : MonoBehaviour
 
         currentLevel++;
         Debug.Log($"🚀 Loading Level {currentLevel}...");
+        gameUIManager.HUD(currentLevel);
+        StartLevel();
 
-        LevelTransitionManager.Instance?.FadeToNextLevel(() =>
-        {
-            UIManager.Instance?.UpdateLevel(currentLevel);
-            StartLevel();
-        });
     }
 
     // 💀 When energy depletes
@@ -133,12 +133,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("💀 Player ran out of energy!");
         Time.timeScale = 0f;
 
-        // Hide WinPanel if somehow active
-        WinPanelManager.Instance?.HideWinPanel();
-
-
-        // Show loss panel
-        LossPanelManager.Instance?.ShowLossPanel();
+        gameUIManager.ShowLossPanel("Player ran out of energy!");
     }
 
     // 🔄 Restart current level
@@ -149,43 +144,42 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f;
 
         Debug.Log("🔄 Restarting current level...");
+        AdManager.Instance.ShowInterstitial();
+        StartLevel();
 
-        LossPanelManager.Instance?.HideLossPanel();
 
-        LevelTransitionManager.Instance?.FadeToNextLevel(() =>
-        {
-            StartLevel();
 
-            OnLevelRestartedEvent?.Invoke(); // Notify listeners (e.g., tutorial reset)
-        });
     }
 
     // 🧱 Restart entire game
     public void RestartGame()
     {
         Debug.Log("🔁 Restarting Game from Level 1...");
-        currentLevel = 1;
-        // AdManager.Instance.ShowInterstitial();
-        StartLevel();
+        AdManager.Instance.ShowInterstitial();
+        gameUIManager.TransitionPanel();
+
     }
 
+    public void Paused()
+    {
+        gameUIManager.PauseGame();
+    }
     // 🎁 Continue after rewarded ad
     public void ContinueAfterAd()
     {
-        // AdManager.Instance.ShowRewarded();
+        AdManager.Instance.ShowRewarded();
 
-        // Reset state
-        SetState(GameState.Playing);
-        Time.timeScale = 1f;
 
+    }
+
+    public void GrantReward()
+    {
         // Refill energy + hide panels
         if (cachedPlayer == null)
             cachedPlayer = FindObjectOfType<PlayerController>();
 
         cachedPlayer?.RestoreFullEnergy();
 
-        WinPanelManager.Instance?.HideWinPanel();
-        LossPanelManager.Instance?.HideLossPanel();
     }
 
     // 👀 Helper for player input

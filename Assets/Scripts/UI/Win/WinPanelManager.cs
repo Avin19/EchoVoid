@@ -16,10 +16,10 @@ public class WinPanelManager : MonoBehaviour
 
         // Set proper sorting order for modal panel
         var uiDoc = GetComponent<UIDocument>();
-        if (uiDoc != null && UIPanelSortingManager.Instance != null)
-        {
-            UIPanelSortingManager.Instance.SetPanelSortOrder(uiDoc, PanelType.Modal);
-        }
+        // if (uiDoc != null && UIPanelSortingManager.Instance != null)
+        // {
+        //     UIPanelSortingManager.Instance.SetPanelSortOrder(uiDoc, PanelType.Modal);
+        // }
     }
 
     void OnDestroy()

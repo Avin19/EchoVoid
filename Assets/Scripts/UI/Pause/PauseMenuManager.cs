@@ -35,10 +35,10 @@ public class PauseMenuManager : MonoBehaviour
 
         // Set proper sorting order for pause panel
         var uiDoc = GetComponent<UIDocument>();
-        if (uiDoc != null && UIPanelSortingManager.Instance != null)
-        {
-            UIPanelSortingManager.Instance.SetPanelSortOrder(uiDoc, PanelType.Pause);
-        }
+        // if (uiDoc != null && UIPanelSortingManager.Instance != null)
+        // {
+        //     UIPanelSortingManager.Instance.SetPanelSortOrder(uiDoc, PanelType.Pause);
+        // }
     }
 
     private void Start()
