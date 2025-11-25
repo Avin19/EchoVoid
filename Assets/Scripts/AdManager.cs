@@ -301,6 +301,7 @@ public class AdManager : MonoBehaviour, IUnityAdsInitializationListener, IUnityA
             // Interstitial finished - reload for next time
             interstitialLoaded = false;
             LoadInterstitial();
+            GrantReward();
         }
         else if (adUnitId.Equals(rewardedAdUnitId))
         {

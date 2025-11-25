@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -40,7 +39,16 @@ public class LevelCompleted : MonoBehaviour
 
     private void WatchButton()
     {
-        GameManager.Instance.ContinueAfterAd();
+
+        if (restartBtnText.text == " EXIT ")
+        {
+            Application.Quit();
+        }
+        else
+        {
+            GameManager.Instance.ContinueAfterAd();
+        }
+
     }
 
     private void RestartButton()
@@ -48,6 +56,7 @@ public class LevelCompleted : MonoBehaviour
         if (restartBtnText.text == " NEXT LEVEL ")
         {
             GameManager.Instance.NextLevel();
+
         }
         else if (restartBtnText.text == " RESTART LEVEL ")
         {

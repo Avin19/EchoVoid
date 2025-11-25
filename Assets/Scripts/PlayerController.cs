@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour
     public SoundPulse pulsePrefab;
     public float pulseCooldown = 0.5f;
     private float nextPulseTime;
-    
+
     [Header("Input Buffering")]
     public float inputBufferTime = 0.2f;
     private float pulseBufferTimer = -1f;
@@ -116,12 +116,12 @@ public class PlayerController : MonoBehaviour
                 pulsePrefab.EmitPulse();
 
             currentEnergy--;
-            UIManager.Instance?.UpdateEnergy(currentEnergy, maxEnergy);
+            GameManager.Instance?.UpdateEngeryLevel(currentEnergy, maxEnergy);
             nextPulseTime = Time.time + pulseCooldown;
 
             if (currentEnergy <= 0)
                 GameManager.Instance?.OnPlayerEnergyDepleted();
-            
+
             return true; // Pulse emitted successfully
         }
         else
@@ -135,14 +135,11 @@ public class PlayerController : MonoBehaviour
     public void RestoreFullEnergy()
     {
         currentEnergy = maxEnergy;
-        UIManager.Instance?.UpdateEnergy(currentEnergy, maxEnergy);
+        GameManager.Instance?.UpdateEngeryLevel(10, maxEnergy);
+        GameManager.Instance?.RestartLevel();
     }
 
-    public void RestoreEnergy(int amount)
-    {
-        currentEnergy = Mathf.Min(maxEnergy, currentEnergy + amount);
-        UIManager.Instance?.UpdateEnergy(currentEnergy, maxEnergy);
-    }
+
 
     public int GetEnergy() => currentEnergy;
     public bool HasEnergy => currentEnergy > 0;

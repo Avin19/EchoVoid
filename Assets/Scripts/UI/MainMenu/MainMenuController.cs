@@ -29,15 +29,13 @@ public class MainMenuController : MonoBehaviour
 
     void OnStartClicked()
     {
-
-        SceneManager.LoadScene("GameScene"); // Change to your actual scene name
+        SceneManager.LoadScene("GameScene");
     }
 
     void OnSettingsClicked()
     {
-
         settingPanel.SetActive(true);
-        // TODO: open settings UI or overlay
+
     }
 
     private void OnDisable()

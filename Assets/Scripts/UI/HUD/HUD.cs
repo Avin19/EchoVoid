@@ -9,6 +9,7 @@ public class HUD : MonoBehaviour
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private Button pauseBtn;
+    [SerializeField] private Slider energySlider;
     private int currentEnergy = 10;
     private int maxEnergy = 10;
 
@@ -16,6 +17,7 @@ public class HUD : MonoBehaviour
     public int CurrentLevel { get; private set; } = 1;
     private void Start()
     {
+        energySlider.maxValue = maxEnergy;
         UpdateLevel(CurrentLevel);
         UpdateScore(0);
         UpdateEnergy(currentEnergy, maxEnergy);
@@ -23,7 +25,10 @@ public class HUD : MonoBehaviour
 
     public void UpdateEnergy(int currentEnergy, int maxEnergy)
     {
-        throw new NotImplementedException();
+        this.currentEnergy = currentEnergy;
+        this.maxEnergy = maxEnergy;
+
+        energySlider.value = currentEnergy;
     }
 
     public void UpdateScore(int v)
@@ -50,5 +55,9 @@ public class HUD : MonoBehaviour
         GameManager.Instance.Paused();
     }
 
-
+    public void UpdateEnergy(int currentEnergy)
+    {
+        this.currentEnergy = currentEnergy;
+        energySlider.value = currentEnergy;
+    }
 }

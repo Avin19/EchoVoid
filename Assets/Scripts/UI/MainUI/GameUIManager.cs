@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using UnityEngine;
 
 
@@ -39,7 +40,7 @@ public class GameUIManager : MonoBehaviour
         Time.timeScale = 1f;
         SetAllPanel();
         transtional.SetActive(true);
-        Invoke(nameof(GameStart), 2f);
+        Invoke(nameof(GameStart), 0.5f);
 
     }
 
@@ -49,7 +50,7 @@ public class GameUIManager : MonoBehaviour
         Time.timeScale = 0f;
         SetAllPanel();
         levelCompleted.SetActive(true);
-        levelCompleted.GetComponent<LevelCompleted>().Setup("PAUSE", " RESUME ", "WATCH AD ");
+        levelCompleted.GetComponent<LevelCompleted>().Setup("PAUSE", " RESUME ", " EXIT ");
     }
 
     public void ResumeGame()
@@ -68,18 +69,23 @@ public class GameUIManager : MonoBehaviour
     {
         hud.GetComponent<HUD>().UpdateScore(score);
     }
+    public void UpdateEngeryLevel(int currentEnergy, int maxEnergy)
+    {
+        hud.GetComponent<HUD>().UpdateEnergy(currentEnergy, maxEnergy);
+    }
 
     public void ShowWinPanel(int score)
     {
         SetAllPanel();
         levelCompleted.SetActive(true);
-        levelCompleted.GetComponent<LevelCompleted>().Setup("Level Completed", score, " NEXT LEVEL ", "EXTRA LIFE");
+        levelCompleted.GetComponent<LevelCompleted>().Setup("LEVEL COMPLETED ", score, " NEXT LEVEL ", " EXTRA LIFE ");
     }
     public void ShowLossPanel(string _message)
     {
         SetAllPanel();
         levelCompleted.SetActive(true);
-        levelCompleted.GetComponent<LevelCompleted>().Setup(_message, " RESTART LEVEL ", "WATCH AD");
+        levelCompleted.GetComponent<LevelCompleted>().Setup(_message, " RESTART LEVEL ", " WATCH AD ");
+
     }
     public void GameStart()
     {

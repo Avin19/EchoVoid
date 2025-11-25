@@ -39,6 +39,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private GameUIManager gameUIManager;
 
+
     private void Awake()
     {
         if (Instance == null)
@@ -142,7 +143,7 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f;
 
         Debug.Log("🔄 Restarting current level...");
-        AdManager.Instance.ShowInterstitial();
+
         StartLevel();
     }
 
@@ -186,5 +187,10 @@ public class GameManager : MonoBehaviour
         if (currentState == newState) return;
         currentState = newState;
         Debug.Log($"📜 GameState changed to: {currentState}");
+    }
+
+    public void UpdateEngeryLevel(int currentEnergy, int maxEnergy)
+    {
+        gameUIManager.UpdateEngeryLevel(currentEnergy, maxEnergy);
     }
 }
